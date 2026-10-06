@@ -1,0 +1,1012 @@
+/* Balkan Rank
+   Barve so barve tekmovalnih plošč: 25 kg rdeča, 20 kg modra, 15 kg rumena, 10 kg zelena.
+   Vsak dvig ima svojo. Ozadje je ravno in skoraj črno, brez sija.
+   Drzna je ena stvar: številka na utežni plošči.
+   Animacije so tri: preliv barve številke, poskok ob vpisu, posed gumba.
+   Nič ob nalaganju, nič ob prehodu miške. */
+
+:root {
+  --crna: #0a0a0a;
+  --plosca: #050505;
+  --rob: #1f1f1f;
+  --rob-mocan: #343434;
+  --besedilo: #efede8;
+  --tiho: #7d7b76;
+  --tise: #565450;
+  --kost: #ebe8e2;
+
+  /* tekmovalne plošče */
+  --p25: #c8102e;
+  --p20: #0b5fbe;
+  --p15: #f2c200;
+  --p10: #00894a;
+
+  --barva: var(--p15);
+  --r-polje: 12px;
+  --r-mala: 10px;
+}
+
+html[data-dvig="bench"] { --barva: var(--p15); }
+html[data-dvig="pocep"] { --barva: var(--p20); }
+html[data-dvig="mrtvi"] { --barva: var(--p25); }
+html[data-dvig="zgibi"] { --barva: var(--p10); }
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--crna);
+  color: var(--besedilo);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body { min-height: 100dvh; display: flex; flex-direction: column; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- glava: ob drsenju se skrči v ozko plavajočo vrstico ---------- */
+
+.glava {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  width: 100%;
+  padding: 20px 0 0;
+  transition: padding 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.glava-vsebina {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 520px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 22px;
+  transition: padding 0.25s ease;
+}
+
+.glava.skrcena {
+  padding: 0;
+  background: rgba(10, 10, 10, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 1px 0 var(--rob);
+}
+.glava.skrcena .glava-vsebina { padding: 8px 16px; }
+.glava.skrcena .znamka { font-size: 13px; }
+.glava.skrcena .jezik { display: none; }
+.glava.skrcena .glava-cta { display: block; }
+
+/* gumb se pokaže šele v skrčeni glavi */
+.glava-cta {
+  display: none;
+  font-family: Oswald, Inter, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  min-height: 38px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--r-mala);
+  background: var(--kost);
+  color: #0a0a0a;
+  cursor: pointer;
+}
+
+.znamka {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: Oswald, Inter, sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+}
+.znamka span { color: var(--barva); transition: color 0.45s ease; }
+
+.znak, .znak img {
+  display: block;
+  width: 36px;
+  height: 36px;
+}
+
+.jezik { display: flex; gap: 2px; }
+
+.jezik-gumb {
+  font-family: Oswald, Inter, sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tise);
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  /* dovolj veliko za prst, čeprav je napis majhen */
+  min-width: 44px;
+  min-height: 44px;
+  padding: 5px 6px 3px;
+  cursor: pointer;
+}
+.jezik-gumb.aktiven {
+  color: #f2c200;
+  border-bottom-color: #f2c200;
+}
+
+/* ---------- postavitev: vse levo ---------- */
+
+/* vodoravno režemo na korenu in telesu, ne na main - sicer bi odrezalo kup
+   kartic, ki namenoma sega čez stolpec z besedilom. Režemo tudi zato, ker
+   50vw pri polni širini fotografij šteje tudi drsnik. */
+html, body { overflow-x: clip; }
+
+main {
+  flex: 1;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 22px 44px;
+}
+
+/* ---------- naslov in obrazec na fotografiji ---------- */
+
+.vrh {
+  position: relative;
+  margin: -84px -22px 0;    /* fotografija sega pod glavo in od roba do roba */
+  padding: 84px 0 34px;
+  isolation: isolate;
+}
+
+.vrh-slika,
+.vrh-slika img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;   /* na telefonu mora ostati vidna oprema levo */
+  z-index: -2;
+}
+
+/* temna plast; pod besedilom je močnejša, da ostane berljivo */
+.vrh-tanca {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  /* okoli 45 % črne; temneje pod naslovom, svetleje na praznem delu,
+     da fotografija ostane prepoznavna */
+  background:
+    linear-gradient(180deg,
+      rgba(10, 10, 10, 0.72) 0%,
+      rgba(10, 10, 10, 0.58) 22%,
+      rgba(10, 10, 10, 0.34) 42%,
+      rgba(10, 10, 10, 0.40) 70%,
+      rgba(10, 10, 10, 0.80) 92%,
+      #0a0a0a 100%),
+    linear-gradient(90deg, rgba(10, 10, 10, 0.45) 0%, rgba(10, 10, 10, 0) 65%);
+}
+
+.vrh-vsebina { padding: 0 22px; }
+
+/* čez fotografijo mora biti tudi tiho besedilo dovolj svetlo */
+.vrh .podnapis { color: #c6c3bd; }
+.vrh .vrstica > label,
+.vrh .vrstica > .oznaka,
+.vrh .plosca-oznaka { color: #a7a49e; }
+
+.pristanek {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 16px 0 26px;
+}
+
+h1 {
+  display: block;
+  font-family: Oswald, Inter, sans-serif;
+  font-weight: 700;
+  font-size: clamp(46px, 15.5vw, 92px);
+  line-height: 0.94;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  margin: 0;
+  padding: 0;
+  max-width: 100%;
+  text-wrap: balance;
+}
+
+.podnapis {
+  display: block;
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--tiho);
+  max-width: 30ch;
+}
+
+/* ---------- prosojne plošče čez fotografijo ---------- */
+
+.plosca-steklo {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 18px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+}
+
+.obrazec {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  padding: 20px 18px 22px;
+}
+
+/* ---------- izbira dviga ---------- */
+
+.dvigi {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.ploscica { position: relative; display: block; }
+
+.ploscica input {
+  position: absolute; inset: 0;
+  opacity: 0; margin: 0; cursor: pointer;
+}
+
+.ploscica > span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 50px;
+  padding: 0 13px;
+  background: #101010;
+  color: var(--tiho);
+  font-size: 14.5px;
+  border: 1px solid var(--rob);
+  border-radius: var(--r-mala);
+}
+
+/* barva pike pride od vrednosti dviga, ne od vrstnega reda v DOM */
+.ploscica em { font-style: normal; }
+
+.ploscica .pika {
+  width: 11px;
+  height: 11px;
+  flex: none;
+  border-radius: 3px;
+}
+input[value="bench"] + span .pika { background: var(--p15); }
+input[value="pocep"] + span .pika { background: var(--p20); }
+input[value="mrtvi"] + span .pika { background: var(--p25); }
+input[value="zgibi"] + span .pika { background: var(--p10); }
+
+.ploscica input:checked + span {
+  background: #161616;
+  color: var(--besedilo);
+  border-color: var(--barva);
+}
+.ploscica input:focus-visible + span { outline: 2px solid var(--barva); outline-offset: 2px; }
+
+/* ---------- glavno polje: številka na plošči ---------- */
+
+.plosca {
+  position: relative;
+  overflow: hidden;
+  background: var(--plosca);
+  border: 1px solid var(--rob);
+  border-radius: var(--r-polje);
+  padding: 14px 18px 6px;
+  box-shadow:
+    inset 0 2px 12px rgba(0, 0, 0, 0.9),
+    0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.plosca:focus-within { border-color: var(--rob-mocan); }
+
+/* 3D utežna plošča: tekstura v ozadju, pod številko in znotraj roba polja */
+.utez {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  right: 12px;
+  width: 152px;
+  height: 152px;
+  transform: translateY(-50%) rotate(-9deg) scaleY(0.84);
+  opacity: 0.09;
+  pointer-events: none;
+}
+.u-telo {
+  fill: var(--barva);
+  fill-opacity: 0.45;
+  transition: fill 0.45s ease;
+}
+.u-rob {
+  stroke: var(--barva);
+  stroke-opacity: 0.55;
+  stroke-width: 3;
+  transition: stroke 0.45s ease;
+}
+.u-vrti {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: vrtenje 26s linear infinite;
+  animation-play-state: paused;
+}
+.plosca.vpisuje .u-vrti { animation-play-state: running; }
+
+@keyframes vrtenje { to { transform: rotate(360deg); } }
+
+/* vsebina polja je nad plosco */
+.plosca-oznaka {
+  position: relative;
+  z-index: 1;
+  display: block;
+  font-size: 14px;
+  color: var(--tiho);
+}
+
+.plosca-vrstica {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+#kolicina {
+  font-family: Oswald, Inter, sans-serif;
+  font-weight: 700;
+  font-size: clamp(88px, 30vw, 132px);
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--barva);
+  caret-color: var(--barva);
+  appearance: none;
+  -webkit-appearance: none;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.95), 0 0 18px rgba(0, 0, 0, 0.8);
+  transform-origin: left bottom;
+  transition: color 0.45s ease;
+}
+/* petmestni vnos (npr. 227,5) na ozkem zaslonu ne sme zadeti ob rob */
+.plosca[data-dolgo="true"] #kolicina { font-size: clamp(62px, 21vw, 112px); }
+
+#kolicina:focus { outline: none; }
+#kolicina::placeholder { color: #1e1e1e; }
+#kolicina::-webkit-outer-spin-button,
+#kolicina::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* animacija 2: rahel poskok ob vpisu */
+#kolicina.poskok { animation: poskok 0.17s ease-out; }
+@keyframes poskok {
+  0%   { transform: translateY(0) scale(1); }
+  45%  { transform: translateY(-4px) scale(1.025); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+.plosca-enota {
+  position: relative;
+  font-family: Oswald, Inter, sans-serif;
+  font-weight: 500;
+  font-size: 26px;
+  color: var(--tiho);
+  flex: none;
+  padding-bottom: 14px;
+}
+
+/* ---------- tihe vrstice ---------- */
+
+.vrstice { border-top: 1px solid var(--rob); }
+
+.vrstica {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 62px;
+  border-bottom: 1px solid var(--rob);
+}
+
+.vrstica > label,
+.vrstica > .oznaka {
+  font-size: 15px;
+  color: var(--tiho);
+}
+
+.desno { display: flex; align-items: center; gap: 8px; }
+
+.polje-okvir {
+  display: flex;
+  align-items: stretch;
+  gap: 7px;
+  padding: 0 13px;
+  min-height: 46px;
+  background: #101010;
+  border: 1px solid var(--rob);
+  border-radius: var(--r-mala);
+}
+.polje-okvir:focus-within { border-color: var(--barva); }
+
+/* vnos naj sega čez vso višino okvirja, da je tarča za prst cel okvir */
+.polje-okvir input[type="number"] {
+  font-family: Oswald, Inter, sans-serif;
+  font-weight: 500;
+  font-size: 21px;
+  width: 54px;
+  padding: 0;
+  text-align: right;
+  color: var(--besedilo);
+  background: none;
+  border: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.polje-okvir > .enota { display: flex; align-items: center; }
+.polje-okvir input[type="number"]:focus { outline: none; }
+.polje-okvir input[type="number"]::placeholder { color: #3a3835; }
+.polje-okvir input[type="number"]::-webkit-outer-spin-button,
+.polje-okvir input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.enota { font-size: 13.5px; color: var(--tise); }
+
+select {
+  font: inherit;
+  font-size: 16px;          /* pod 16 px iPhone ob dotiku poveča stran */
+  color: var(--besedilo);
+  background: none;
+  border: 0;
+  padding: 0 18px 0 0;
+  text-align: right;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--tiho) 50%),
+    linear-gradient(135deg, var(--tiho) 50%, transparent 50%);
+  background-position: right 4px center, right 0 center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  direction: rtl;
+}
+select:focus { outline: none; }
+select option { background: #121212; color: var(--besedilo); direction: ltr; }
+
+/* preklop moški / ženska */
+
+.preklop { position: relative; display: block; }
+.preklop input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+
+.preklop span {
+  display: flex;
+  align-items: center;
+  min-height: 46px;
+  padding: 0 15px;
+  font-size: 14.5px;
+  color: var(--tiho);
+  background: #101010;
+  border: 1px solid var(--rob);
+  border-radius: var(--r-mala);
+}
+.preklop input:checked + span {
+  color: var(--crna);
+  background: var(--kost);
+  border-color: var(--kost);
+}
+.preklop input:focus-visible + span { outline: 2px solid var(--barva); outline-offset: 2px; }
+
+/* ---------- napaka ---------- */
+
+.napaka {
+  margin: -12px 0 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #ff5a4d;
+}
+.je-napaka .polje-okvir { border-color: #ff5a4d; }
+.plosca.je-napaka { border-color: #ff5a4d; }
+
+/* ---------- gumb: poln, težek, enobarven ---------- */
+
+.glavni-gumb {
+  position: relative;
+  overflow: hidden;
+  font-family: Oswald, Inter, sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  min-height: 62px;
+  width: 100%;
+  border: 0;
+  border-radius: var(--r-polje);
+  background: var(--kost);
+  color: #0a0a0a;
+  cursor: pointer;
+  /* animacija 3: posed ob pritisku */
+  box-shadow: 0 4px 0 #9b9892;
+  transition: transform 0.07s ease-out, box-shadow 0.07s ease-out;
+}
+
+/* počasen premik svetlobe čez gumb, vsakih nekaj sekund */
+.glavni-gumb::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 45%;
+  background: linear-gradient(100deg, rgba(255, 255, 255, 0) 0%,
+                              rgba(255, 255, 255, 0.75) 50%,
+                              rgba(255, 255, 255, 0) 100%);
+  animation: svetloba 7s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes svetloba {
+  0%, 72%  { transform: translateX(0); }
+  100%     { transform: translateX(380%); }
+}
+.glavni-gumb:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 #9b9892;
+}
+.glavni-gumb:focus-visible { outline: 2px solid var(--barva); outline-offset: 3px; }
+
+/* ---------- rezultat ---------- */
+
+.rezultat {
+  margin-top: 34px;
+  scroll-margin-top: 78px;   /* pod skrčeno glavo, da je kartica cela vidna */
+}
+
+.kartica {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+/* ---------- zaporedje po oddaji obrazca ---------- */
+
+.obrazec { transition: opacity 0.3s ease; }
+.obrazec.zbledi { opacity: 0.35; pointer-events: none; }
+
+/* kratko stanje računanja */
+.racunam {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 120px;
+  padding: 8px 0;
+}
+.racunam span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--barva);
+  animation: utrip 1s ease-in-out infinite;
+}
+.racunam span:nth-child(2) { animation-delay: 0.15s; }
+.racunam span:nth-child(3) { animation-delay: 0.3s; }
+.racunam p {
+  margin: 0 0 0 6px;
+  font-size: 15px;
+  color: var(--tiho);
+}
+@keyframes utrip {
+  0%, 100% { opacity: 0.25; transform: scale(0.85); }
+  50%      { opacity: 1; transform: scale(1); }
+}
+
+/* kartica prileti od spodaj in se ustavi z rahlim odbojem */
+.kartica.prileti { animation: prilet 0.6s cubic-bezier(0.2, 0.8, 0.3, 1.1) both; }
+@keyframes prilet {
+  0%   { opacity: 0; transform: translateY(70px) scale(0.96); }
+  60%  { opacity: 1; transform: translateY(-10px) scale(1.01); }
+  80%  { transform: translateY(3px) scale(1); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* polje za e-naslov se pokaže šele na koncu */
+.prenos { transition: opacity 0.35s ease, transform 0.35s ease; }
+.prenos.caka { opacity: 0; transform: translateY(10px); pointer-events: none; }
+
+/* ---------- prenos kartice ---------- */
+
+.prenos { margin-top: 22px; }
+
+.prenos > label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 15px;
+  color: var(--tiho);
+}
+
+.prenos-vrstica { display: flex; flex-direction: column; gap: 10px; }
+
+.polje-okvir.sirok { width: 100%; min-height: 58px; padding: 0 15px; }
+.polje-okvir.sirok input {
+  font: inherit;
+  font-size: 16px;
+  width: 100%;
+  padding: 0;
+  align-self: stretch;
+  color: var(--besedilo);
+  background: none;
+  border: 0;
+  text-align: left;
+}
+.polje-okvir.sirok input:focus { outline: none; }
+.polje-okvir.sirok input::placeholder { color: #3a3835; }
+.polje-okvir.je-napaka { border-color: #ff5a4d; }
+
+.prenos .glavni-gumb { min-height: 58px; }
+.prenos .glavni-gumb:disabled { cursor: default; background: #4a4844; color: #0a0a0a; }
+
+/* sporočilo o napaki je navaden blok pod gumbom, nikoli čezenj;
+   prostor zanj je rezerviran vnaprej, da se vsebina pod njim ob napaki ne premakne */
+.prenos .napaka {
+  margin: 14px 0 0;
+  min-height: 40px;          /* dve vrstici; na ozkem zaslonu se besedilo prelomi */
+}
+.prenos .napaka[hidden] {
+  display: block;
+  visibility: hidden;
+}
+
+.prenos-opomba {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--tise);
+}
+
+@media (min-width: 400px) {
+  .prenos .napaka { min-height: 22px; }   /* tu gre najdaljše sporočilo v eno vrstico */
+}
+
+.izid {
+  background: #101010;
+  border: 1px solid var(--rob);
+  border-radius: var(--r-polje);
+  padding: 20px 18px;
+}
+.izid-rang {
+  font-family: Oswald, Inter, sans-serif;
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1.1;
+  color: var(--barva);
+}
+.izid-odstotek {
+  font-family: Oswald, Inter, sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--besedilo);
+  margin-top: 2px;
+}
+.izid-primerjava {
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--tise);
+}
+.izid-crta {
+  height: 8px;
+  margin: 16px 0 18px;
+  background: #1c1c1c;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.izid-crta i { display: block; height: 100%; background: var(--barva); }
+
+.izid-podatki {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 14px;
+  margin: 0;
+  font-size: 14.5px;
+}
+.izid-podatki dt { color: var(--tiho); }
+.izid-podatki dd { margin: 0; text-align: right; font-weight: 500; }
+
+/* ---------- razdelki pod obrazcem ----------
+   Stopnjevana temnost: vrh je najtemnejši, lestvica odtenek svetlejša,
+   vprašanja najsvetlejša. Razdelka sta čez vso širino, da se stopnja vidi. */
+
+.razdelek {
+  position: relative;
+  margin: 0 -22px;
+  padding: 48px 22px 52px;
+}
+
+#lestvica { background: #111111; }
+
+#vprasanja {
+  background: #191919;
+  padding-bottom: 58px;
+}
+
+.razdelek h2 {
+  font-family: Oswald, Inter, sans-serif;
+  font-weight: 700;
+  font-size: clamp(26px, 8vw, 36px);
+  line-height: 1.08;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+}
+
+.razdelek-opis {
+  margin: 0 0 20px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--tiho);
+}
+.lestvica-spol { color: var(--barva); white-space: nowrap; }
+
+.razdelek-opomba {
+  margin: 14px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--tise);
+}
+
+/* lestvica mej */
+
+.tabela-ovoj {
+  border: 1px solid var(--rob);
+  border-radius: var(--r-polje);
+  overflow: hidden;
+}
+
+.lestvica-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.lestvica-tabela th,
+.lestvica-tabela td {
+  padding: 13px 10px;
+  text-align: right;
+  border-bottom: 1px solid var(--rob);
+}
+.lestvica-tabela thead th {
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--tise);
+  background: #101010;
+}
+.lestvica-tabela th:first-child,
+.lestvica-tabela td:first-child { text-align: left; padding-left: 14px; }
+.lestvica-tabela td:last-child,
+.lestvica-tabela th:last-child { padding-right: 14px; }
+.lestvica-tabela tbody tr:last-child th,
+.lestvica-tabela tbody tr:last-child td { border-bottom: 0; }
+
+.lestvica-tabela tbody th {
+  font-family: Oswald, Inter, sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: var(--rang-barva, var(--besedilo));
+}
+.lestvica-tabela tbody td {
+  font-family: Oswald, Inter, sans-serif;
+  font-weight: 500;
+  font-size: 17px;
+  color: var(--besedilo);
+}
+.lestvica-tabela .pika-rang {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  margin-right: 8px;
+  background: var(--rang-barva, var(--besedilo));
+  vertical-align: 1px;
+}
+
+/* ---------- lebdeče kartice nad obrazcem ---------- */
+
+/* telefon: v vrsti z rahlim prekrivanjem in brez vrtenja,
+   dovolj majhne, da se vidi tudi začetek obrazca */
+.kup {
+  position: relative;
+  height: 212px;
+  margin: 4px 0 26px;
+}
+
+.kup-mesto {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(148px, 38vw);
+  margin-left: calc(min(148px, 38vw) / -2);
+}
+.kup-levo { transform: translateX(-62%); z-index: 1; }
+.kup-desno { transform: translateX(62%); z-index: 2; }
+.kup-sredina { z-index: 3; }
+
+.kup-lebdi {
+  animation: lebdenje 8s ease-in-out infinite;
+  will-change: transform;
+}
+.kup-sredina .kup-lebdi { animation-delay: -2.6s; }
+.kup-desno .kup-lebdi { animation-delay: -5.2s; }
+
+.kup-mesto canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+}
+
+@keyframes lebdenje {
+  0%, 100% { transform: translateY(-5px); }
+  50%      { transform: translateY(5px); }
+}
+
+/* vsako vprašanje je svoja ploščica s svetlo obrobo */
+
+.vprasanje {
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+}
+.vprasanje:last-of-type { margin-bottom: 0; }
+.vprasanje[open] { background: rgba(255, 255, 255, 0.055); }
+
+.vprasanje summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 60px;
+  padding: 14px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--besedilo);
+  cursor: pointer;
+  list-style: none;
+}
+.vprasanje summary::-webkit-details-marker { display: none; }
+.vprasanje summary::after {
+  content: '+';
+  flex: none;
+  font-family: Oswald, Inter, sans-serif;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--barva);
+}
+.vprasanje[open] summary::after { content: '–'; }
+.vprasanje p {
+  margin: 0 0 16px;
+  padding: 0 16px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--tiho);
+}
+
+/* razdelki se ob drsenju dvignejo od spodaj */
+
+.razkrij {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.razkrij.vidno { opacity: 1; transform: none; }
+
+/* ---------- noga ---------- */
+
+.noga {
+  padding: 18px 22px 28px;
+  max-width: 520px;
+  width: 100%;
+  margin: 0 auto;
+  border-top: 1px solid var(--rob);
+}
+.noga p { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--tise); max-width: 46ch; }
+.noga-znamka {
+  margin-top: 12px !important;
+  font-family: Oswald, Inter, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: #3a3835 !important;
+}
+
+/* ---------- namizje ---------- */
+
+/* ploščice ostanejo 2 x 2 tudi na namizju - v štirih stolpcih se ime prelomi */
+@media (min-width: 680px) {
+  main, .glava, .noga { max-width: 540px; }
+
+  /* fotografija gre čez vso širino okna, besedilo ostane v stolpcu */
+  .vrh {
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+  }
+  .vrh-vsebina { max-width: 540px; margin: 0 auto; }
+  .vrh-slika img { object-position: center; }
+
+  /* kartice se postavijo delno čez sebe, srednja spredaj in večja;
+     kup sme biti širši od stolpca z besedilom */
+  .kup {
+    height: 360px;
+    margin: 6px -70px 30px;
+  }
+  .kup-mesto {
+    top: 50%;
+    width: 200px;
+    margin: -125px 0 0 -100px;
+    transition: transform 0.35s ease, filter 0.35s ease;
+  }
+  .kup-levo    { transform: translateX(-128px) rotate(-7deg); z-index: 1; }
+  .kup-desno   { transform: translateX(128px) rotate(6.5deg); z-index: 2; }
+  .kup-sredina { transform: scale(1.1); z-index: 3; }
+
+  /* ob prehodu miške se kartica dvigne naprej in poravna */
+  @media (hover: hover) {
+    .kup-mesto:hover {
+      z-index: 9;
+      transform: translateY(-18px) rotate(0deg) scale(1.16);
+      filter: brightness(1.05);
+    }
+    .kup-levo:hover  { transform: translateX(-128px) translateY(-18px) rotate(0deg) scale(1.16); }
+    .kup-desno:hover { transform: translateX(128px) translateY(-18px) rotate(0deg) scale(1.16); }
+  }
+
+  .kup-lebdi { animation-duration: 6s; }
+  .kup-mesto canvas { box-shadow: 0 26px 60px rgba(0, 0, 0, 0.8); }
+}
+
+/* najožji telefoni: da se "Mrtvo dizanje" ne prelomi v dve vrstici */
+@media (max-width: 345px) {
+  main, .glava, .noga { padding-left: 16px; padding-right: 16px; }
+  .ploscica > span { font-size: 13px; padding: 0 10px; gap: 8px; }
+}
+
+/* ---------- manj gibanja ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .znamka span, .u-telo, .u-rob, #kolicina, .glavni-gumb { transition: none; }
+  .u-vrti { animation: none; }
+  #kolicina.poskok { animation: none; }
+  .glavni-gumb:active { transform: none; box-shadow: 0 4px 0 #9b9892; }
+
+  /* nič lebdenja kartic, razdelki so takoj vidni, rezultat brez animacije */
+  .kup-lebdi { animation: none; }
+  .kup-mesto { transition: none; }
+  .kartica.prileti { animation: none; }
+  .racunam span { animation: none; opacity: 0.7; }
+  .obrazec, .prenos { transition: none; }
+  .glavni-gumb::after { animation: none; display: none; }
+  .vrh-slika img, .pas img { transform: none !important; }
+  .glava, .glava-vsebina { transition: none; }
+  .razkrij { opacity: 1; transform: none; transition: none; }
+}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Balkan Rank — testi izračuna</title>
+<style>
+  body { margin: 0; padding: 28px 20px 60px; background: #0a0a0a; color: #efede8;
+         font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 1.5; }
+  .ovoj { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 18px; margin: 0 0 4px; font-family: system-ui, sans-serif; }
+  .pod { color: #7d7b76; margin: 0 0 22px; font-family: system-ui, sans-serif; }
+  .povzetek { padding: 12px 14px; border: 1px solid #1f1f1f; border-radius: 10px; margin-bottom: 20px; }
+  .ok { color: #43c47a; } .ni { color: #ff5a4d; }
+  table { width: 100%; border-collapse: collapse; }
+  td { padding: 5px 8px; border-bottom: 1px solid #161616; vertical-align: top; }
+  td.z { width: 26px; text-align: center; }
+  td.v { color: #7d7b76; white-space: nowrap; }
+  tr.pade td { background: #1a0d0c; }
+  h2 { font-size: 14px; margin: 28px 0 8px; font-family: system-ui, sans-serif; color: #7d7b76; }
+</style>
+</head>
+<body>
+<div class="ovoj">
+  <h1>Testi izračuna</h1>
+  <p class="pod">izracun.js — meje, interpolacija odstotka, napredek, mejni primeri</p>
+  <div class="povzetek" id="povzetek">teče…</div>
+  <table id="izpis"></table>
+
+  <h2>Primeri izračuna</h2>
+  <table id="primeri"></table>
+</div>
+
+<script src="izracun.js"></script>
+<script src="testi.js"></script>
+<script>
+(function () {
+  var izidi = TESTI.pozeni();
+  var pade = izidi.filter(function (i) { return !i.ok; });
+
+  document.getElementById('povzetek').innerHTML =
+    izidi.length + ' testov · <span class="ok">' + (izidi.length - pade.length) + ' uspelo</span> · ' +
+    (pade.length ? '<span class="ni">' + pade.length + ' padlo</span>' : '<span class="ok">0 padlo</span>');
+
+  document.getElementById('izpis').innerHTML = izidi.map(function (i) {
+    return '<tr class="' + (i.ok ? '' : 'pade') + '">' +
+      '<td class="z ' + (i.ok ? 'ok' : 'ni') + '">' + (i.ok ? '✓' : '✕') + '</td>' +
+      '<td>' + i.ime + '</td>' +
+      '<td class="v">' + i.dobil + (i.ok ? '' : ' (pričakovano ' + i.pricakoval + ')') + '</td></tr>';
+  }).join('');
+
+  var primeri = [
+    ['m', 'bench', 60, 75], ['m', 'bench', 100, 75], ['m', 'bench', 140, 75],
+    ['m', 'pocep', 180, 90], ['m', 'mrtvi', 220, 88], ['m', 'zgibi', 12, 80],
+    ['z', 'bench', 40, 60], ['z', 'pocep', 90, 62], ['z', 'mrtvi', 125, 62], ['z', 'zgibi', 6, 58]
+  ];
+  var imena = { bench: 'bench press', pocep: 'počep', mrtvi: 'mrtvi dvig', zgibi: 'zgibi' };
+
+  document.getElementById('primeri').innerHTML = primeri.map(function (p) {
+    var x = BR.izracunaj({ spol: p[0], dvig: p[1], kolicina: p[2], telesna_teza: p[3] });
+    var enota = p[1] === 'zgibi' ? ' pon.' : ' kg';
+    return '<tr><td class="v">' + (p[0] === 'm' ? 'moški' : 'ženska') + ', ' + imena[p[1]] + '</td>' +
+      '<td class="v">' + p[2] + enota + ' @ ' + p[3] + ' kg</td>' +
+      '<td class="v">' + x.razmerje_besedilo + '</td>' +
+      '<td><b>' + x.rang + '</b></td>' +
+      '<td>' + x.odstotek_besedilo + '</td>' +
+      '<td class="v">napredek ' + Math.round(x.napredek * 100) + ' % → ' + (x.naslednji || 'vrh') + '</td></tr>';
+  }).join('');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Balkan Rank — pregled kartic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Inter:wght@400;500&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; padding: 24px; background: #0a0a0a; color: #efede8;
+         font-family: Inter, system-ui, sans-serif; }
+  h1 { font-size: 16px; font-weight: 500; margin: 0 0 18px; }
+  .mreza { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; max-width: 1700px; }
+  .lezece { grid-template-columns: repeat(auto-fit, minmax(460px, 1fr)); }
+  canvas { width: 100%; height: auto; display: block; border-radius: 6px; }
+</style>
+</head>
+<body>
+<h1>Pokončna kartica 1080×1350, vseh pet rangov</h1>
+<div class="mreza" id="mreza"></div>
+
+<h1 style="margin-top:34px">Ležeča kartica 1600×900</h1>
+<div class="mreza lezece" id="mreza-lezece"></div>
+
+<script src="izracun.js"></script>
+<script src="logo.js"></script>
+<script src="kartica.js"></script>
+<script>
+(function () {
+  /* vrednosti pridejo iz pravega izracuna, da pregled kaze iste stevilke kot stran */
+  var primeri = [
+    { spol: 'm', dvig: 'bench', kolicina: 45,  teza: 75 },
+    { spol: 'm', dvig: 'bench', kolicina: 80,  teza: 75 },
+    { spol: 'm', dvig: 'pocep', kolicina: 160, teza: 88 },
+    { spol: 'm', dvig: 'mrtvi', kolicina: 220, teza: 88 },
+    { spol: 'm', dvig: 'zgibi', kolicina: 22,  teza: 78 }
+  ];
+
+  BRKartica.pripravi().then(function () {
+    var mreza = document.getElementById('mreza');
+    var mrezaL = document.getElementById('mreza-lezece');
+
+    primeri.forEach(function (p) {
+      var izid = BR.izracunaj({ spol: p.spol, dvig: p.dvig, kolicina: p.kolicina, telesna_teza: p.teza });
+      var zgibi = p.dvig === 'zgibi';
+      var c = document.createElement('canvas');
+      mreza.appendChild(c);
+      var podatki = {
+        rang: izid.rang,
+        rang_ime: izid.rang,
+        dvig: p.dvig,
+        kolicina: p.kolicina,
+        enota: zgibi ? '×' : 'KG',
+        odstotek: izid.odstotek,
+        teza_kategorija: 'DO ' + (Math.ceil(p.teza / 5) * 5) + ' KG'
+      };
+      BRKartica.pokoncna(c, podatki);
+
+      var cl = document.createElement('canvas');
+      mrezaL.appendChild(cl);
+      BRKartica.lezeca(cl, podatki);
+    });
+  });
+})();
+</script>
+</body>
+</html>
