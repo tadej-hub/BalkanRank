@@ -39,6 +39,24 @@ var BR = (function () {
   /* meja se steje za doseženo tudi ob zaokrozitveni napaki deljenja */
   var EPS = 1e-9;
 
+  /* Zgornja meja verjetnega: nad njo vnosa ne sprejmemo, ker bi pokvaril
+     lestvico. Pri dvigih je veckratnik telesne teze, pri zgibih ponovitve.
+     Meja sama je se dovoljena, zavrnemo sele tisto nad njo. */
+  var NEMOGOCE = { bench: 3, pocep: 4, mrtvi: 5 };
+  var NEMOGOCE_ZGIBI = 60;
+
+  /* vrne null, ce je vnos sprejemljiv, sicer { meja, zgibi } za sporocilo */
+  function nemogoc(vnos) {
+    if (vnos.dvig === 'zgibi') {
+      if (vnos.kolicina > NEMOGOCE_ZGIBI) return { meja: NEMOGOCE_ZGIBI, zgibi: true };
+      return null;
+    }
+    var k = NEMOGOCE[vnos.dvig];
+    if (!k) return null;
+    if (vnos.kolicina > vnos.telesna_teza * k + EPS) return { meja: k, zgibi: false };
+    return null;
+  }
+
   function omeji(x, naj_min, naj_max) {
     return Math.min(naj_max, Math.max(naj_min, x));
   }
@@ -119,6 +137,9 @@ var BR = (function () {
     RANGI: RANGI,
     PERCENTILI: PERCENTILI,
     PRAGI: PRAGI,
+    NEMOGOCE: NEMOGOCE,
+    NEMOGOCE_ZGIBI: NEMOGOCE_ZGIBI,
+    nemogoc: nemogoc,
     pragi: pragi,
     vrednost: vrednost,
     indeksRanga: indeksRanga,

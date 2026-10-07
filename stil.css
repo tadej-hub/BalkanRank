@@ -441,6 +441,20 @@ input[value="zgibi"] + span .pika { background: var(--p10); }
 
 .desno { display: flex; align-items: center; gap: 8px; }
 
+/* vzdevek je besedilno polje, zato sme zasesti ves prostor desno od napisa */
+.vrstica-vzdevek { border-bottom: 0; min-height: 56px; }
+.vrstica-vzdevek > .desno { flex: 1; min-width: 0; }
+.vrstica-vzdevek .polje-okvir.sirok { min-height: 46px; }
+
+.vrstica-opomba {
+  margin: 0;
+  padding-bottom: 14px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--tise);
+  border-bottom: 1px solid var(--rob);
+}
+
 .polje-okvir {
   display: flex;
   align-items: stretch;
@@ -746,6 +760,44 @@ select option { background: #121212; color: var(--besedilo); direction: ltr; }
 
 #lestvica { background: #111111; }
 
+/* razdelek s fotografijo v celotnem ozadju */
+
+.razdelek-s-sliko { isolation: isolate; overflow: hidden; }
+
+.razdelek-slika,
+.razdelek-slika img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* telefon: ročke v ospredju so na levi, prazna tla na desni */
+  object-position: left center;
+  z-index: -2;
+}
+
+/* enakomerna temna plast čez vso fotografijo, na robovih prehod v ozadje strani */
+.razdelek-tanca {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  /* enakomerno okoli 72 % črne čez vso fotografijo; le 40 px ob zgornjem in
+     spodnjem robu se zlije z barvo razdelka, da ni vidnega šiva */
+  background:
+    linear-gradient(180deg, #111111 0, rgba(17, 17, 17, 0) 40px),
+    linear-gradient(0deg, #111111 0, rgba(17, 17, 17, 0) 40px),
+    rgba(10, 10, 10, 0.72);
+}
+
+/* naslov, opis in opomba ležijo neposredno na zatemnjeni fotografiji; tiho sivo
+   besedilo je na njej preslabo berljivo, zato je v tem razdelku svetlejše */
+.razdelek-s-sliko h2,
+.razdelek-s-sliko .razdelek-opis,
+.razdelek-s-sliko .razdelek-opomba { position: relative; }
+.razdelek-s-sliko .razdelek-opis,
+.razdelek-s-sliko .razdelek-opomba { color: #bcb8b0; }
+
 #vprasanja {
   background: #191919;
   padding-bottom: 58px;
@@ -781,6 +833,16 @@ select option { background: #121212; color: var(--besedilo); direction: ltr; }
   border: 1px solid var(--rob);
   border-radius: var(--r-polje);
   overflow: hidden;
+}
+
+/* v prosojni plošči ostane steklo vidno: obroba in glava tabele sta prosojni */
+.tabela-ovoj.plosca-steklo {
+  position: relative;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.tabela-ovoj.plosca-steklo .lestvica-tabela thead th {
+  background: rgba(255, 255, 255, 0.05);
+  color: #b4b0a8;
 }
 
 .lestvica-tabela {
@@ -820,6 +882,66 @@ select option { background: #121212; color: var(--besedilo); direction: ltr; }
   font-size: 17px;
   color: var(--besedilo);
 }
+/* lestvica ljudi */
+
+#razvrstitev {
+  background: #151515;
+  scroll-margin-top: 56px;   /* gumb nanj pomakne; naslov mora biti pod glavo */
+}
+
+/* pet stolpcev na telefonu: manjša pisava in tesnejši razmiki kot pri mejah */
+.razvrstitev-tabela th,
+.razvrstitev-tabela td { padding: 11px 7px; }
+.razvrstitev-tabela thead th { font-size: 11.5px; }
+.razvrstitev-tabela tbody td {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;        /* "70 kg" se ne sme prelomiti v dve vrstici */
+}
+.razvrstitev-tabela .pika-rang { margin-right: 6px; }
+
+/* mesto je ozek stolpec, vzdevek pa dobi ves preostali prostor */
+.razvrstitev-tabela .mesto-st {
+  width: 1%;
+  padding-right: 0;
+  font-family: Oswald, Inter, sans-serif;
+  font-size: 14px;
+  color: var(--tise);
+  font-variant-numeric: tabular-nums;
+}
+.razvrstitev-tabela tbody th.vzdevek-celica {
+  max-width: 1px;            /* da ellipsis sploh deluje v tabeli */
+  width: 99%;
+  font-family: Inter, sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0;
+  color: var(--besedilo);
+  text-align: left;
+  padding-left: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.razvrstitev-tabela .rang-celica {
+  font-family: Oswald, Inter, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--rang-barva, var(--besedilo));
+  white-space: nowrap;
+}
+
+/* mesto, ki ga človek dobi po izračunu */
+.mesto {
+  margin: 16px 0 0;
+  font-family: Oswald, Inter, sans-serif;
+  font-weight: 500;
+  font-size: 17px;
+  text-align: center;
+  color: var(--besedilo);
+}
+
 .lestvica-tabela .pika-rang {
   display: inline-block;
   width: 8px;
@@ -837,7 +959,114 @@ select option { background: #121212; color: var(--besedilo); direction: ltr; }
 .kup {
   position: relative;
   height: 212px;
-  margin: 4px 0 26px;
+  margin: 4px 0 20px;
+}
+
+/* ---------- kratka lestvica nad obrazcem ---------- */
+
+.kratka {
+  padding: 14px 16px 16px;
+  margin-bottom: 18px;
+}
+
+.kratka-naslov {
+  font-family: Oswald, Inter, sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+}
+
+/* ob zamenjavi dviga se vsebina prelije, da je sprememba vidna */
+.kratka-telo { transition: opacity .17s ease; }
+.kratka-telo.se-menja { opacity: 0; }
+
+.kratka-kaj {
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  color: var(--tiho);
+}
+
+.kratka-seznam {
+  list-style: none;
+  counter-reset: mesto;
+  margin: 0;
+  padding: 0;
+}
+
+.kratka-seznam li {
+  counter-increment: mesto;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-height: 30px;
+  font-size: 14px;
+}
+.kratka-seznam li + li { border-top: 1px solid var(--rob); }
+
+.kratka-seznam li::before {
+  content: counter(mesto);
+  flex: none;
+  width: 14px;
+  font-family: Oswald, Inter, sans-serif;
+  font-size: 13px;
+  color: var(--tise);
+  font-variant-numeric: tabular-nums;
+}
+
+.kratka-vzdevek {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  color: var(--besedilo);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* dvignjena teža je izpostavljena, razmerje stoji drobno ob njej */
+.kratka-glavno {
+  flex: none;
+  font-family: Oswald, Inter, sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--rang-barva, var(--besedilo));
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.kratka-ob {
+  flex: none;
+  width: 44px;
+  text-align: right;
+  font-size: 12px;
+  color: var(--tise);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* tih gumb: glavni gumb na strani je samo eden, in to je "Izračunaj rang" */
+.kratka-gumb {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  min-height: 40px;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--tiho);
+  background: none;
+  border: 1px solid var(--rob);
+  border-radius: var(--r-mala);
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .kratka-gumb:hover { color: var(--besedilo); border-color: var(--barva); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kratka-telo { transition: none; }
 }
 
 .kup-mesto {
@@ -915,12 +1144,21 @@ select option { background: #121212; color: var(--besedilo); direction: ltr; }
 
 /* razdelki se ob drsenju dvignejo od spodaj */
 
-.razkrij {
+/* skrijemo samo, kadar teče skript, ki zna razdelek tudi pokazati;
+   brez skripta je vsebina normalno vidna */
+.js .razkrij {
   opacity: 0;
   transform: translateY(22px);
   transition: opacity 0.55s ease, transform 0.55s ease;
 }
-.razkrij.vidno { opacity: 1; transform: none; }
+.js .razkrij.vidno { opacity: 1; transform: none; }
+
+/* lebdeče kartice so prazna platna, dokler jih skript ne nariše */
+html:not(.js) .kup { display: none; }
+
+/* brez skripta se glava ne zna skrčiti in dobiti podlage, zato naj ne lebdi
+   nad besedilom, ampak se preprosto odpelje navzgor */
+html:not(.js) .glava { position: static; }
 
 /* ---------- noga ---------- */
 
@@ -953,6 +1191,8 @@ select option { background: #121212; color: var(--besedilo); direction: ltr; }
   }
   .vrh-vsebina { max-width: 540px; margin: 0 auto; }
   .vrh-slika img { object-position: center; }
+  /* na širšem zaslonu je prostora dovolj za celo vrsto ročk */
+  .razdelek-slika img { object-position: center; }
 
   /* kartice se postavijo delno čez sebe, srednja spredaj in večja;
      kup sme biti širši od stolpca z besedilom */
@@ -989,6 +1229,11 @@ select option { background: #121212; color: var(--besedilo); direction: ltr; }
 @media (max-width: 345px) {
   main, .glava, .noga { padding-left: 16px; padding-right: 16px; }
   .ploscica > span { font-size: 13px; padding: 0 10px; gap: 8px; }
+
+  /* na najožjih zaslonih barva vrstice pove rang tudi brez pike */
+  .razvrstitev-tabela .pika-rang { display: none; }
+  .razvrstitev-tabela th,
+  .razvrstitev-tabela td { padding: 11px 5px; }
 }
 
 /* ---------- manj gibanja ---------- */
@@ -1008,5 +1253,5 @@ select option { background: #121212; color: var(--besedilo); direction: ltr; }
   .glavni-gumb::after { animation: none; display: none; }
   .vrh-slika img, .pas img { transform: none !important; }
   .glava, .glava-vsebina { transition: none; }
-  .razkrij { opacity: 1; transform: none; transition: none; }
+  .razkrij, .js .razkrij { opacity: 1; transform: none; transition: none; }
 }

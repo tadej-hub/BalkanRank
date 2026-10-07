@@ -18,10 +18,10 @@ iz brskalnika.
 | `izracun.js` | meje rangov, rang, odstotek, napredek — brez DOM |
 | `kartica.js` | risanje pokončne (1080×1350) in ležeče (1600×900) kartice |
 | `jeziki.js` | vsa besedila za sl / sr / en |
-| `baza.js` | vstavljanje v Supabase |
+| `baza.js` | vstavljanje v Supabase in branje lestvice |
 | `config.js` | URL in javni ključ Supabase |
 | `baza.sql` | tabeli in pravila dostopa za Supabase |
-| `testi.html`, `testi.js` | testi izračuna, 153 primerov; odpri v brskalniku |
+| `testi.html`, `testi.js` | testi izračuna, 173 primerov; odpri v brskalniku |
 | `pregled.html` | razvojni pregled obeh oblik kartice v vseh petih rangih |
 
 ## Lokalni zagon
@@ -31,13 +31,36 @@ Dvoklik na `index.html`. Strežnika ne potrebuje; vse datoteke se naložijo z di
 ## Supabase
 
 1. V Supabase odpri **SQL Editor** in zaženi vsebino `baza.sql`. Nastaneta
-   tabeli `vnosi` in `naslovi` ter pravili, ki iz brskalnika dovolita samo
-   vpisovanje, branja pa ne.
+   tabeli `vnosi` in `naslovi` ter pravila dostopa. Datoteko se sme zagnati
+   večkrat; na obstoječi bazi doda samo tisto, česar še ni.
 2. V `config.js` vpiši **Project URL** in **anon / publishable** ključ
    (Settings → API). Ključ `service_role` ne sme sem.
 
 Ključ je v gitu namenoma: zasnovan je kot javen in v brskalnik pride tako ali
 tako, dostop pa omejuje RLS. Brez njega objavljena stran ne bi imela nastavitev.
+
+### Kaj je iz brskalnika dosegljivo
+
+| | `vnosi` | `naslovi` |
+|---|---|---|
+| vstavljanje | da | da |
+| branje | samo vrstice z vzdevkom in samo stolpci `dvig`, `spol`, `vzdevek`, `telesna_teza`, `kolicina`, `razmerje`, `rang` | ne |
+| spreminjanje, brisanje | ne | ne |
+
+E-naslovi so v ločeni tabeli `naslovi`, ki nima pravila za branje, zato do njih
+od zunaj ni poti. Branje tabele `vnosi` je omejeno dvakrat: pravilo RLS pokaže
+samo vrstice z vzdevkom, pravica `grant select (…)` pa samo naštete stolpce —
+trajanje treniranja, jezik in čas vnosa ostanejo skriti.
+
+## Lestvica
+
+Kdor v obrazec vpiše vzdevek, pride na lestvico; brez vzdevka dobi samo kartico.
+Lestvica je ločena za vsak dvig in vsak spol, razvrščena po razmerju do telesne
+teže (pri zgibih po številu ponovitev) in pokaže prvih dvajset. Dokler na njej
+ni vsaj deset vnosov, je skrita — pri treh ljudeh ne pove ničesar.
+
+Vnosi nad mejo verjetnega se zavrnejo: bench nad 3× telesne teže, počep nad 4×,
+mrtvi dvig nad 5× in zgibi nad 60 ponovitev.
 
 ## Objava na GitHub Pages
 

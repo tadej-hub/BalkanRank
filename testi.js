@@ -173,6 +173,37 @@ var TESTI = (function () {
     enako('142.5 kg pri 95 kg → rang', decimalke.rang, 'SREBRO');
     enako('142.5 kg pri 95 kg → odstotek', decimalke.odstotek, 35);
 
+    /* 13. nemogoci vnosi: meja je se sprejeta, karkoli nad njo ne */
+    function nem(dvig, kolicina, teza) {
+      return BR.nemogoc({ dvig: dvig, kolicina: kolicina, telesna_teza: teza || 80 });
+    }
+
+    [['bench', 3], ['pocep', 4], ['mrtvi', 5]].forEach(function (par) {
+      var dvig = par[0], k = par[1], t = 80;
+      enako(dvig + ': natanko ' + k + '× telesne teže je sprejeto',
+            nem(dvig, k * t, t), null);
+      vrni(dvig + ': malo čez ' + k + '× je zavrnjeno',
+           nem(dvig, k * t + 0.5, t) !== null, 'zavrnjeno', 'zavrnjeno: ' + (nem(dvig, k * t + 0.5, t) !== null));
+      enako(dvig + ': zavrnitev pove mejo',
+            (nem(dvig, k * t + 0.5, t) || {}).meja, k);
+      enako(dvig + ': polovica meje je sprejeta',
+            nem(dvig, k * t / 2, t), null);
+    });
+
+    /* meja se mora premikati s telesno tezo, ne biti fiksna */
+    enako('bench: 151 kg pri 50 kg je zavrnjeno', nem('bench', 151, 50) !== null, true);
+    enako('bench: 150 kg pri 120 kg je sprejeto', nem('bench', 150, 120), null);
+
+    enako('zgibi: natanko 60 ponovitev je sprejeto', nem('zgibi', 60), null);
+    enako('zgibi: 61 ponovitev je zavrnjeno', nem('zgibi', 61) !== null, true);
+    enako('zgibi: zavrnitev pove mejo', (nem('zgibi', 61) || {}).meja, 60);
+    enako('zgibi: zavrnitev je označena kot ponovitve', (nem('zgibi', 61) || {}).zgibi, true);
+    /* pri zgibih telesna teza na mejo ne vpliva */
+    enako('zgibi: 40 ponovitev pri 50 kg je sprejeto', nem('zgibi', 40, 50), null);
+
+    /* zaokrozitev pri deljenju ne sme zavrniti vnosa natanko na meji */
+    enako('bench: 3× pri 73.3 kg je sprejeto', nem('bench', 3 * 73.3, 73.3), null);
+
     return izidi;
   }
 

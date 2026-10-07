@@ -43,6 +43,10 @@ var BR_JEZIKI = {
     teza: 'Telesna teža',
     namig_teza: '75',
 
+    vzdevek: 'Vzdevek',
+    namig_vzdevek: 'neobvezno',
+    vzdevek_opomba: 'Z vzdevkom prideš na lestvico. Brez njega dobiš samo kartico.',
+
     spol: 'Spol',
     spol_m: 'moški',
     spol_z: 'ženska',
@@ -62,6 +66,9 @@ var BR_JEZIKI = {
     e_kolicina_meja: 'Ta številka ni videti prava. Preveri jo.',
     e_teza: 'Vpiši svojo telesno težo.',
     e_teza_meja: 'Telesna teža naj bo med 30 in 250 kg.',
+    e_nemogoce_kg: 'Pri tem dvigu sprejmemo največ {meja}-kratnik telesne teže. Preveri številko.',
+    e_nemogoce_pon: 'Sprejmemo največ {meja} ponovitev. Preveri številko.',
+    e_vzdevek: 'Vzdevek naj ima od 2 do 20 znakov.',
     e_email: 'Vpiši svoj e-naslov.',
     e_email_oblika: 'Ta e-naslov ni videti pravi. Preveri ga.',
 
@@ -85,6 +92,24 @@ var BR_JEZIKI = {
     l_za_moske: 'za moške',
     l_za_zenske: 'za ženske',
 
+    /* kratka lestvica nad obrazcem */
+    kr_naslov: 'Najmočnejši',
+    kr_gumb: 'Prikaži celotno lestvico',
+
+    /* lestvica ljudi */
+    r_naslov: 'Lestvica',
+    r_opis: 'Najboljših dvajset po razmerju do telesne teže.',
+    r_opis_zgibi: 'Najboljših dvajset po številu ponovitev.',
+    r_mesto_stolpec: '#',
+    r_vzdevek: 'Vzdevek',
+    r_teza: 'Teža',
+    r_razmerje: 'Razmerje',
+    r_ponovitve: 'Ponovitve',
+    r_rang: 'Rang',
+    r_opomba: 'Na lestvico prideš z vzdevkom v obrazcu. Prikazani so vzdevek, telesna teža, razmerje in rang — nič drugega.',
+    r_mesto: 'Si {mesto}. od {skupaj} na lestvici.',
+    r_mesto_brez: 'Z vzdevkom bi bil tvoj rezultat {mesto}. od {skupaj}.',
+
     /* pogosta vprašanja */
     v_naslov: 'Pogosta vprašanja',
     v1_q: 'Kako se izračuna rang?',
@@ -92,7 +117,7 @@ var BR_JEZIKI = {
     v2_q: 'Od kod podatki?',
     v2_a: 'Meje so postavljene po javno dostopnih podatkih o standardih moči, ne po meritvah obiskovalcev te strani. So ocena, ne uradni podatek.',
     v3_q: 'Ali je brezplačno?',
-    v3_a: 'Da. E-naslov vpišeš samo ob prenosu kartice in se shrani skupaj z rangom in dvigom.',
+    v3_a: 'Da. E-naslov vpišeš samo ob prenosu kartice in se shrani skupaj z rangom in dvigom. Vzdevek je neobvezen; kdor ga vpiše, je z njim viden na lestvici.',
 
     /* noga */
     opozorilo: 'Številke so ocena na podlagi javno dostopnih podatkov o dvigih, ne uradni podatek.',
@@ -140,6 +165,10 @@ var BR_JEZIKI = {
     teza: 'Telesna težina',
     namig_teza: '75',
 
+    vzdevek: 'Nadimak',
+    namig_vzdevek: 'nije obavezno',
+    vzdevek_opomba: 'Sa nadimkom ulaziš na lestvicu. Bez njega dobiješ samo karticu.',
+
     spol: 'Pol',
     spol_m: 'muški',
     spol_z: 'ženski',
@@ -158,6 +187,9 @@ var BR_JEZIKI = {
     e_kolicina_meja: 'Taj broj ne izgleda tačno. Proveri ga.',
     e_teza: 'Upiši svoju telesnu težinu.',
     e_teza_meja: 'Telesna težina treba da bude između 30 i 250 kg.',
+    e_nemogoce_kg: 'Za ovu vežbu primamo najviše {meja}-struku telesnu težinu. Proveri broj.',
+    e_nemogoce_pon: 'Primamo najviše {meja} ponavljanja. Proveri broj.',
+    e_vzdevek: 'Nadimak treba da ima od 2 do 20 znakova.',
     e_email: 'Upiši svoj e-mail.',
     e_email_oblika: 'Taj e-mail ne izgleda tačno. Proveri ga.',
 
@@ -178,13 +210,29 @@ var BR_JEZIKI = {
     l_za_moske: 'za muškarce',
     l_za_zenske: 'za žene',
 
+    kr_naslov: 'Najjači',
+    kr_gumb: 'Prikaži celu lestvicu',
+
+    r_naslov: 'Lestvica',
+    r_opis: 'Najboljih dvadeset po odnosu prema telesnoj težini.',
+    r_opis_zgibi: 'Najboljih dvadeset po broju ponavljanja.',
+    r_mesto_stolpec: '#',
+    r_vzdevek: 'Nadimak',
+    r_teza: 'Težina',
+    r_razmerje: 'Odnos',
+    r_ponovitve: 'Ponavljanja',
+    r_rang: 'Rang',
+    r_opomba: 'Na lestvicu se ulazi nadimkom u obrascu. Prikazani su nadimak, telesna težina, odnos i rang — ništa drugo.',
+    r_mesto: 'Ti si {mesto}. od {skupaj} na lestvici.',
+    r_mesto_brez: 'Sa nadimkom bi tvoj rezultat bio {mesto}. od {skupaj}.',
+
     v_naslov: 'Česta pitanja',
     v1_q: 'Kako se računa rang?',
     v1_a: 'Podignutu težinu delimo tvojom telesnom težinom, a kod zgibova brojimo ponavljanja. Rang je najviši stepen čiju granicu rezultat dostigne. Procenat se između dve granice linearno interpolira i ograničen je na 1–99.',
     v2_q: 'Odakle podaci?',
     v2_a: 'Granice su postavljene po javno dostupnim podacima o standardima snage, ne po merenju posetilaca ove stranice. To je procena, nije zvaničan podatak.',
     v3_q: 'Da li je besplatno?',
-    v3_a: 'Jeste. E-mail upisuješ samo pri preuzimanju kartice i čuva se zajedno sa rangom i vežbom.',
+    v3_a: 'Jeste. E-mail upisuješ samo pri preuzimanju kartice i čuva se zajedno sa rangom i vežbom. Nadimak nije obavezan; ko ga upiše, vidi se sa njim na lestvici.',
 
     opozorilo: 'Brojke su procena na osnovu javno dostupnih podataka o dizanju, nisu zvaničan podatak.',
     primerjava: 'Poređenje sa posetiocima teretane.',
@@ -228,6 +276,10 @@ var BR_JEZIKI = {
     teza: 'Body weight',
     namig_teza: '75',
 
+    vzdevek: 'Nickname',
+    namig_vzdevek: 'optional',
+    vzdevek_opomba: 'A nickname puts you on the leaderboard. Without one you just get the card.',
+
     spol: 'Sex',
     spol_m: 'male',
     spol_z: 'female',
@@ -246,6 +298,9 @@ var BR_JEZIKI = {
     e_kolicina_meja: 'That number does not look right. Check it.',
     e_teza: 'Enter your body weight.',
     e_teza_meja: 'Body weight should be between 30 and 250 kg.',
+    e_nemogoce_kg: 'For this lift we accept at most {meja}× body weight. Check the number.',
+    e_nemogoce_pon: 'We accept at most {meja} reps. Check the number.',
+    e_vzdevek: 'A nickname should be 2 to 20 characters.',
     e_email: 'Enter your email.',
     e_email_oblika: 'That email does not look right. Check it.',
 
@@ -266,13 +321,29 @@ var BR_JEZIKI = {
     l_za_moske: 'for men',
     l_za_zenske: 'for women',
 
+    kr_naslov: 'Strongest',
+    kr_gumb: 'Show the full leaderboard',
+
+    r_naslov: 'Leaderboard',
+    r_opis: 'The top twenty by ratio to body weight.',
+    r_opis_zgibi: 'The top twenty by number of reps.',
+    r_mesto_stolpec: '#',
+    r_vzdevek: 'Nickname',
+    r_teza: 'Weight',
+    r_razmerje: 'Ratio',
+    r_ponovitve: 'Reps',
+    r_rang: 'Rank',
+    r_opomba: 'You get on the leaderboard by entering a nickname in the form. It shows nickname, body weight, ratio and rank — nothing else.',
+    r_mesto: 'You are #{mesto} of {skupaj} on the leaderboard.',
+    r_mesto_brez: 'With a nickname your result would be #{mesto} of {skupaj}.',
+
     v_naslov: 'Common questions',
     v1_q: 'How is the rank calculated?',
     v1_a: 'We divide the weight you lift by your body weight, and for pull-ups we count reps. Your rank is the highest tier whose threshold you reach. The percentage is interpolated linearly between two thresholds and clamped to 1–99.',
     v2_q: 'Where does the data come from?',
     v2_a: 'The thresholds come from publicly available strength standards, not from measuring visitors to this site. They are an estimate, not an official figure.',
     v3_q: 'Is it free?',
-    v3_a: 'Yes. You only enter your email when downloading the card, and it is stored together with your rank and lift.',
+    v3_a: 'Yes. You only enter your email when downloading the card, and it is stored together with your rank and lift. The nickname is optional; if you enter one, it is shown with you on the leaderboard.',
 
     opozorilo: 'These numbers are an estimate based on publicly available lifting data, not an official figure.',
     primerjava: 'Compared with gym-goers.',

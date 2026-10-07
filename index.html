@@ -15,7 +15,65 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;500&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="stil.css?v=18">
+<link rel="stylesheet" href="stil.css?v=24">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Balkan Rank",
+  "inLanguage": ["sl", "sr-Latn", "en"],
+  "applicationCategory": "HealthApplication",
+  "operatingSystem": "Vsi brskalniki",
+  "browserRequirements": "Zahteva JavaScript za izračun in izris kartice.",
+  "description": "Vpišeš dvignjeno težo in telesno težo, izračuna se ti rang od brona do diamanta in odstotek, ter dobiš kartico za objavo. Brez računa in brez prijave.",
+  "featureList": [
+    "Izračun ranga za bench press, počep, mrtvi dvig in zgibe",
+    "Odstotek glede na javno dostopne standarde moči",
+    "Kartica v pokončni in ležeči obliki za prenos",
+    "Slovenščina, bosansko-hrvaško-srbsko in angleško"
+  ],
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "EUR"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "inLanguage": "sl",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Kako se izračuna rang?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dvignjeno težo delimo s tvojo telesno težo, pri zgibih štejemo ponovitve. Rang je najvišja stopnja, katere mejo rezultat doseže. Odstotek se med dvema mejama linearno interpolira in je omejen na 1–99."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Od kod podatki?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Meje so postavljene po javno dostopnih podatkih o standardih moči, ne po meritvah obiskovalcev te strani. So ocena, ne uradni podatek."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Ali je brezplačno?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Da. E-naslov vpišeš samo ob prenosu kartice in se shrani skupaj z rangom in dvigom. Vzdevek je neobvezen; kdor ga vpiše, je z njim viden na lestvici."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -29,8 +87,8 @@
       BALKAN<span>RANK</span>
     </div>
     <!-- gumbi se izrišejo iz BR_SEZNAM_JEZIKOV -->
-    <nav class="jezik" id="jezik-izbira" aria-label="Jezik / Jezik / Language"></nav>
-    <button type="button" class="glava-cta" id="glava-cta" data-t="g_cta"></button>
+    <nav class="jezik" id="jezik-izbira" aria-label="Jezik / Jezik / Language"><button type="button" class="jezik-gumb aktiven" data-jezik="sl">slo</button><button type="button" class="jezik-gumb" data-jezik="sr">bhs</button><button type="button" class="jezik-gumb" data-jezik="en">en</button></nav>
+    <button type="button" class="glava-cta" id="glava-cta" data-t="g_cta">Izračunaj</button>
   </div>
 </header>
 
@@ -47,8 +105,8 @@
     <div class="vrh-vsebina">
 
     <div class="pristanek">
-      <h1 data-t="naslov"></h1>
-      <p class="podnapis" data-t="podnapis"></p>
+      <h1 data-t="naslov">Kakšen je tvoj rang?</h1>
+      <p class="podnapis" data-t="podnapis">V petnajstih sekundah izveš, kje si med ljudmi svoje teže, in dobiš kartico za objavo.</p>
     </div>
 
     <!-- kartice se rišejo v canvas, da so v izbranem jeziku -->
@@ -58,26 +116,36 @@
       <div class="kup-mesto kup-desno"><div class="kup-lebdi"><canvas width="720" height="900"></canvas></div></div>
     </div>
 
+    <!-- kratka lestvica: prvih pet; skrita, dokler na lestvici ni deset vnosov -->
+    <section class="kratka plosca-steklo" id="kratka" aria-labelledby="kratka-naslov" hidden>
+      <h2 class="kratka-naslov" id="kratka-naslov" data-t="kr_naslov">Najmočnejši</h2>
+      <div class="kratka-telo" id="kratka-telo">
+        <p class="kratka-kaj" id="kratka-kaj"></p>
+        <ol class="kratka-seznam" id="kratka-seznam"></ol>
+      </div>
+      <button type="button" class="kratka-gumb" id="kratka-gumb" data-t="kr_gumb">Prikaži celotno lestvico</button>
+    </section>
+
   <form id="obrazec" class="obrazec plosca-steklo" novalidate>
 
     <!-- izbira dviga: barve tekmovalnih plošč -->
     <fieldset class="dvigi">
-      <legend class="sr-only" data-t="dvig"></legend>
+      <legend class="sr-only" data-t="dvig">Dvig</legend>
       <label class="ploscica">
         <input type="radio" name="dvig" value="bench" checked>
-        <span><i class="pika" aria-hidden="true"></i><em data-t="dvig_bench"></em></span>
+        <span><i class="pika" aria-hidden="true"></i><em data-t="dvig_bench">Bench press</em></span>
       </label>
       <label class="ploscica">
         <input type="radio" name="dvig" value="pocep">
-        <span><i class="pika" aria-hidden="true"></i><em data-t="dvig_pocep"></em></span>
+        <span><i class="pika" aria-hidden="true"></i><em data-t="dvig_pocep">Počep</em></span>
       </label>
       <label class="ploscica">
         <input type="radio" name="dvig" value="mrtvi">
-        <span><i class="pika" aria-hidden="true"></i><em data-t="dvig_mrtvi"></em></span>
+        <span><i class="pika" aria-hidden="true"></i><em data-t="dvig_mrtvi">Mrtvi dvig</em></span>
       </label>
       <label class="ploscica">
         <input type="radio" name="dvig" value="zgibi">
-        <span><i class="pika" aria-hidden="true"></i><em data-t="dvig_zgibi"></em></span>
+        <span><i class="pika" aria-hidden="true"></i><em data-t="dvig_zgibi">Zgibi</em></span>
       </label>
     </fieldset>
 
@@ -122,11 +190,11 @@
         <circle class="u-rob" cx="160" cy="160" r="50" fill="none"/>
       </svg>
 
-      <label for="kolicina" class="plosca-oznaka" id="oznaka-kolicina" data-t="kolicina_kg"></label>
+      <label for="kolicina" class="plosca-oznaka" id="oznaka-kolicina" data-t="kolicina_kg">Dvignjena teža</label>
       <div class="plosca-vrstica">
         <input type="number" id="kolicina" name="kolicina" inputmode="decimal"
                min="1" max="500" step="0.5" placeholder="0" autocomplete="off" required>
-        <span class="plosca-enota" id="enota-kolicina" data-t="enota_kg"></span>
+        <span class="plosca-enota" id="enota-kolicina" data-t="enota_kg">kg</span>
       </div>
     </div>
 
@@ -134,40 +202,52 @@
     <div class="vrstice">
 
       <div class="vrstica">
-        <label for="teza" data-t="teza"></label>
+        <label for="teza" data-t="teza">Telesna teža</label>
         <div class="desno">
           <span class="polje-okvir">
             <input type="number" id="teza" name="teza" inputmode="decimal"
-                   min="30" max="250" step="0.5" data-t-namig="namig_teza" autocomplete="off" required>
-            <span class="enota" data-t="enota_kg"></span>
+                   min="30" max="250" step="0.5" data-t-namig="namig_teza" placeholder="75" autocomplete="off" required>
+            <span class="enota" data-t="enota_kg">kg</span>
           </span>
         </div>
       </div>
 
+      <div class="vrstica vrstica-vzdevek">
+        <label for="vzdevek" data-t="vzdevek">Vzdevek</label>
+        <div class="desno">
+          <span class="polje-okvir sirok">
+            <input type="text" id="vzdevek" name="vzdevek" maxlength="20"
+                   autocomplete="nickname" spellcheck="false"
+                   data-t-namig="namig_vzdevek" placeholder="neobvezno">
+          </span>
+        </div>
+      </div>
+      <p class="vrstica-opomba" data-t="vzdevek_opomba">Z vzdevkom prideš na lestvico. Brez njega dobiš samo kartico.</p>
+
       <div class="vrstica">
-        <span class="oznaka" id="oznaka-spol" data-t="spol"></span>
+        <span class="oznaka" id="oznaka-spol" data-t="spol">Spol</span>
         <div class="desno" role="radiogroup" aria-labelledby="oznaka-spol">
           <label class="preklop">
             <input type="radio" name="spol" value="m" checked>
-            <span data-t="spol_m"></span>
+            <span data-t="spol_m">moški</span>
           </label>
           <label class="preklop">
             <input type="radio" name="spol" value="z">
-            <span data-t="spol_z"></span>
+            <span data-t="spol_z">ženska</span>
           </label>
         </div>
       </div>
 
       <div class="vrstica">
-        <label for="trajanje" data-t="trajanje"></label>
+        <label for="trajanje" data-t="trajanje">Treniram</label>
         <div class="desno">
           <span class="polje-okvir">
             <select id="trajanje" name="trajanje">
-              <option value="pod6m" data-t="trajanje_pod6m"></option>
-              <option value="6-12m" data-t="trajanje_6_12m"></option>
-              <option value="1-3l" selected data-t="trajanje_1_3l"></option>
-              <option value="3-5l" data-t="trajanje_3_5l"></option>
-              <option value="nad5l" data-t="trajanje_nad5l"></option>
+              <option value="pod6m" data-t="trajanje_pod6m">manj kot 6 mesecev</option>
+              <option value="6-12m" data-t="trajanje_6_12m">6–12 mesecev</option>
+              <option value="1-3l" selected data-t="trajanje_1_3l">1–3 leta</option>
+              <option value="3-5l" data-t="trajanje_3_5l">3–5 let</option>
+              <option value="nad5l" data-t="trajanje_nad5l">več kot 5 let</option>
             </select>
           </span>
         </div>
@@ -177,7 +257,7 @@
 
     <p class="napaka" id="napaka" role="alert" hidden></p>
 
-    <button type="submit" class="glavni-gumb" data-t="izracunaj"></button>
+    <button type="submit" class="glavni-gumb" data-t="izracunaj">Izračunaj rang</button>
   </form>
 
     </div>
@@ -186,49 +266,81 @@
   <section id="rezultat" class="rezultat" hidden aria-live="polite"></section>
 
   <!-- lestvica mej -->
-  <section class="razdelek razkrij" id="lestvica">
-    <h2 data-t="l_naslov"></h2>
+  <section class="razdelek razdelek-s-sliko razkrij" id="lestvica">
+    <picture class="razdelek-slika" aria-hidden="true">
+      <source srcset="slike/gym-rocke.webp" type="image/webp">
+      <img src="slike/gym-rocke.jpg" alt="" loading="lazy" decoding="async">
+    </picture>
+    <div class="razdelek-tanca" aria-hidden="true"></div>
+
+    <h2 data-t="l_naslov">Kaj moraš dvigniti</h2>
     <p class="razdelek-opis">
-      <span data-t="l_opis"></span>
-      <span class="lestvica-spol" id="lestvica-spol"></span>
+      <span data-t="l_opis">Meja za vsak rang, kot večkratnik telesne teže.</span>
+      <span class="lestvica-spol" id="lestvica-spol"> (za moške)</span>
+    </p>
+    <!-- izhodiščna vsebina za moške; skript jo prepiše ob menjavi spola ali jezika -->
+    <div class="tabela-ovoj plosca-steklo">
+      <table class="lestvica-tabela" id="lestvica-tabela">
+        <thead>
+          <tr><th>Rang</th><th>Bench press</th><th>Počep</th><th>Mrtvi dvig</th></tr>
+        </thead>
+        <tbody>
+          <tr style="--rang-barva:#c08a4e"><th scope="row"><span class="pika-rang"></span>BRON</th><td>0.50×</td><td>0.75×</td><td>1.00×</td></tr>
+          <tr style="--rang-barva:#c6d4e2"><th scope="row"><span class="pika-rang"></span>SREBRO</th><td>0.75×</td><td>1.25×</td><td>1.50×</td></tr>
+          <tr style="--rang-barva:#f2c200"><th scope="row"><span class="pika-rang"></span>ZLATO</th><td>1.25×</td><td>1.75×</td><td>2.00×</td></tr>
+          <tr style="--rang-barva:#b0e4f0"><th scope="row"><span class="pika-rang"></span>PLATINA</th><td>1.75×</td><td>2.25×</td><td>2.50×</td></tr>
+          <tr style="--rang-barva:#a8d6ff"><th scope="row"><span class="pika-rang"></span>DIAMANT</th><td>2.00×</td><td>2.75×</td><td>3.00×</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="razdelek-opomba" id="lestvica-opomba">Pri zgibih štejejo ponovitve: 1 / 5 / 10 / 15 / 20.</p>
+  </section>
+
+  <!-- lestvica ljudi; skrita, dokler na njej ni vsaj deset vnosov,
+       zato je vsebina v celoti iz skripta -->
+  <section class="razdelek razkrij" id="razvrstitev" hidden>
+    <h2 data-t="r_naslov">Lestvica</h2>
+    <p class="razdelek-opis">
+      <span id="razvrstitev-opis">Najboljših dvajset po razmerju do telesne teže.</span>
+      <span class="lestvica-spol" id="razvrstitev-kaj"></span>
     </p>
     <div class="tabela-ovoj">
-      <table class="lestvica-tabela" id="lestvica-tabela"></table>
+      <table class="lestvica-tabela razvrstitev-tabela" id="razvrstitev-tabela"></table>
     </div>
-    <p class="razdelek-opomba" id="lestvica-opomba"></p>
+    <p class="razdelek-opomba" id="razvrstitev-opomba" data-t="r_opomba">Na lestvico prideš z vzdevkom v obrazcu. Prikazani so vzdevek, telesna teža, razmerje in rang — nič drugega.</p>
   </section>
 
   <!-- pogosta vprašanja -->
   <section class="razdelek razkrij" id="vprasanja">
-    <h2 data-t="v_naslov"></h2>
+    <h2 data-t="v_naslov">Pogosta vprašanja</h2>
     <details class="vprasanje">
-      <summary data-t="v1_q"></summary>
-      <p data-t="v1_a"></p>
+      <summary data-t="v1_q">Kako se izračuna rang?</summary>
+      <p data-t="v1_a">Dvignjeno težo delimo s tvojo telesno težo, pri zgibih štejemo ponovitve. Rang je najvišja stopnja, katere mejo rezultat doseže. Odstotek se med dvema mejama linearno interpolira in je omejen na 1–99.</p>
     </details>
     <details class="vprasanje">
-      <summary data-t="v2_q"></summary>
-      <p data-t="v2_a"></p>
+      <summary data-t="v2_q">Od kod podatki?</summary>
+      <p data-t="v2_a">Meje so postavljene po javno dostopnih podatkih o standardih moči, ne po meritvah obiskovalcev te strani. So ocena, ne uradni podatek.</p>
     </details>
     <details class="vprasanje">
-      <summary data-t="v3_q"></summary>
-      <p data-t="v3_a"></p>
+      <summary data-t="v3_q">Ali je brezplačno?</summary>
+      <p data-t="v3_a">Da. E-naslov vpišeš samo ob prenosu kartice in se shrani skupaj z rangom in dvigom. Vzdevek je neobvezen; kdor ga vpiše, je z njim viden na lestvici.</p>
     </details>
   </section>
 
 </main>
 
 <footer class="noga">
-  <p data-t="opozorilo"></p>
-  <p data-t="primerjava"></p>
+  <p data-t="opozorilo">Številke so ocena na podlagi javno dostopnih podatkov o dvigih, ne uradni podatek.</p>
+  <p data-t="primerjava">Primerjava z obiskovalci fitnesa.</p>
   <p class="noga-znamka">BALKAN RANK</p>
 </footer>
 
-<script src="config.js?v=18"></script>
-<script src="jeziki.js?v=18"></script>
-<script src="baza.js?v=18"></script>
-<script src="izracun.js?v=18"></script>
-<script src="logo.js?v=18"></script>
-<script src="kartica.js?v=18"></script>
-<script src="app.js?v=18"></script>
+<script src="config.js?v=24"></script>
+<script src="jeziki.js?v=24"></script>
+<script src="baza.js?v=24"></script>
+<script src="izracun.js?v=24"></script>
+<script src="logo.js?v=24"></script>
+<script src="kartica.js?v=24"></script>
+<script src="app.js?v=24"></script>
 </body>
 </html>
