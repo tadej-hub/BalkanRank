@@ -73,6 +73,17 @@ var BRKartica = (function () {
     okvir_h: 109, okvir_rob: 56, okvir_r: 20
   };
 
+  /* Notranja ploskev plaketne obrobe (glej obroba): levo od 48, desno do W - 47.
+     Karkoli zunaj tega zakrije obroba. Številka ima ob nekaterih vrednostih
+     (decimalke, tri široke števke) skupaj z enoto več prostora, kot ga je, zato
+     se v tem primeru skupina centrira in po potrebi zmanjša. */
+  var NOTRI_LEVO = 48;
+  var NOTRI_DESNO = 47;
+  /* Najmanjši prosti rob med obrobo in številko ali enoto, na obeh straneh.
+     32 px je tudi najožji rob, ki ga imajo kartice z udobno rezervo (100 kg ima
+     33,5 px, 160 kg 36 px), in rob, na katerega se postavi prilagojena skupina. */
+  var ENOTA_ZRAK = 32;
+
   var znakSlika = null;
 
   function barva(c, a) {
@@ -163,6 +174,20 @@ var BRKartica = (function () {
     return ctx.measureText(besedilo).width;
   }
 
+  /* mere besedila glede na izhodišče pri levi poravnavi: širina pisave, kje
+     se črke dejansko začnejo in končajo ter višina črk nad črto pisave */
+  function merjenje(ctx, besedilo, teza, velikost) {
+    ctx.font = pisava(teza, velikost);
+    ctx.textAlign = 'left';
+    var m = ctx.measureText(besedilo);
+    return {
+      sirina: m.width,
+      levo: m.actualBoundingBoxLeft,
+      desno: m.actualBoundingBoxRight,
+      vzpon: m.actualBoundingBoxAscent
+    };
+  }
+
   /* ---------- ozadje ---------- */
 
   function ozadje(ctx, t) {
@@ -245,11 +270,13 @@ var BRKartica = (function () {
   }
 
   /* kovinsko besedilo z zgornjim robom črk na dani višini;
-     pri številki še ekstrudirana senca navzdol-desno */
-  function kovinskoOdVrha(ctx, besedilo, velikost, met, vrh, globina) {
+     pri številki še ekstrudirana senca navzdol-desno.
+     "sredina" je vodoravna sredina besedila; brez nje je na sredini kartice. */
+  function kovinskoOdVrha(ctx, besedilo, velikost, met, vrh, globina, sredina) {
     ctx.font = pisava(700, velikost);
     var m = ctx.measureText(besedilo);
     var a = m.actualBoundingBoxAscent, d = m.actualBoundingBoxDescent;
+    var dx = sredina === undefined ? 0 : sredina - W / 2;
 
     var visina = Math.ceil(a + d) + 8;
     var crta = a + 4;
@@ -260,13 +287,13 @@ var BRKartica = (function () {
       ctx.save();
       ctx.globalAlpha = 190 / 255;
       for (var off = globina; off > 0; off--) {
-        ctx.drawImage(sil, off, y0 + off, W, visina);
+        ctx.drawImage(sil, off + dx, y0 + off, W, visina);
       }
       ctx.restore();
     }
 
     ctx.drawImage(kovinskoPlatno(besedilo, velikost, met, crta, W, visina, false),
-                  0, y0, W, visina);
+                  dx, y0, W, visina);
   }
 
   /* ---------- logotip v barvi ranga ----------
@@ -403,15 +430,65 @@ var BRKartica = (function () {
 
   /* ---------- vsebina kartice ---------- */
 
+  /* Številka je na sredini kartice, enota visi desno od nje. To drži, dokler
+     do obrobe ostane vsaj ENOTA_ZRAK prostega roba na obeh straneh; pri
+     širših številkah (decimalke, široke števke) bi enoto obroba zakrila, se je
+     dotaknila ali bi segla čez rob platna. Takrat se številka z enoto postavi
+     kot ena skupina, enako oddaljena od obeh strani obrobe, in se po potrebi
+     sorazmerno zmanjša (črke, razmik in globina sence), osnovnica številke pa
+     ostane na isti višini. */
   function stevilkaInEnota(ctx, t, p, m) {
     var stevilka = String(p.kolicina);
-    kovinskoOdVrha(ctx, stevilka, m.stevilka_vel, t.met, m.stevilka_vrh, m.globina);
+    var S = merjenje(ctx, stevilka, 700, m.stevilka_vel);
+    var E = merjenje(ctx, p.enota, 700, m.enota_vel);
 
-    var sirinaStevilke = sirinaBesedila(ctx, stevilka, 700, m.stevilka_vel);
+    var mejaLevo = NOTRI_LEVO + ENOTA_ZRAK;
+    var mejaDesno = W - NOTRI_DESNO - ENOTA_ZRAK;
+    var levoStevilke = W / 2 - S.sirina / 2 - S.levo;
+    var desnoEnote = W / 2 + S.sirina / 2 + m.enota_razmik + E.desno;
+    var stane = levoStevilke >= mejaLevo && desnoEnote <= mejaDesno;
+
+    if (stane) {
+      kovinskoOdVrha(ctx, stevilka, m.stevilka_vel, t.met, m.stevilka_vrh, m.globina);
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillStyle = barva(t.acc);
+      izpisiOdVrha(ctx, p.enota, 700, m.enota_vel,
+                   W / 2 + S.sirina / 2 + m.enota_razmik, m.enota_vrh, 'left');
+      return;
+    }
+
+    /* skupina od levega roba črk številke do desnega roba črk enote; mere
+       so pri polni velikosti in glede na izhodišče številke */
+    var vLevo = -S.levo;
+    var vDesno = S.sirina + m.enota_razmik + E.desno;
+    var sirinaSkupine = vDesno - vLevo;
+    var prostorLevo = NOTRI_LEVO + ENOTA_ZRAK;
+    var prostorDesno = W - NOTRI_DESNO - ENOTA_ZRAK;
+    var s = Math.min(1, (prostorDesno - prostorLevo) / sirinaSkupine);
+
+    /* skupina na sredini med obema notranjima robovoma obrobe */
+    var izhodisce = (prostorLevo + prostorDesno) / 2 - s * sirinaSkupine / 2 - s * vLevo;
+
+    /* osnovnica številke in enote se pri zmanjšanju premakne sorazmerno */
+    var osnovnicaS = m.stevilka_vrh + S.vzpon;
+    var osnovnicaE = m.enota_vrh + E.vzpon;
+    var vrhS = m.stevilka_vrh, vrhE = m.enota_vrh;
+    var velS = m.stevilka_vel, velE = m.enota_vel, globina = m.globina;
+    if (s < 1) {
+      velS = m.stevilka_vel * s;
+      velE = m.enota_vel * s;
+      globina = Math.max(1, Math.round(m.globina * s));
+      vrhS = osnovnicaS - merjenje(ctx, stevilka, 700, velS).vzpon;
+      var novaOsnovnicaE = osnovnicaS - (osnovnicaS - osnovnicaE) * s;
+      vrhE = novaOsnovnicaE - merjenje(ctx, p.enota, 700, velE).vzpon;
+    }
+
+    kovinskoOdVrha(ctx, stevilka, velS, t.met, vrhS, globina,
+                   izhodisce + s * S.sirina / 2);
     ctx.textBaseline = 'alphabetic';
     ctx.fillStyle = barva(t.acc);
-    izpisiOdVrha(ctx, p.enota, 700, m.enota_vel,
-                 W / 2 + sirinaStevilke / 2 + m.enota_razmik, m.enota_vrh, 'left');
+    izpisiOdVrha(ctx, p.enota, 700, velE,
+                 izhodisce + s * (S.sirina + m.enota_razmik), vrhE, 'left');
   }
 
   function vsebina(ctx, t, p, m) {

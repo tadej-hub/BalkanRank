@@ -145,6 +145,26 @@ body { min-height: 100dvh; display: flex; flex-direction: column; }
   border-bottom-color: #f2c200;
 }
 
+/* štirje napisi ("Srpski", "Hrvatski") skupaj z znamko ne gredo v eno vrstico
+   na telefonu, zato je preklopnik tam v drugi vrstici pod znamko; ob krčenju
+   glave se vrstica zloži, da vsebina pod njo ne poskoči */
+@media (max-width: 460px) {
+  .glava-vsebina { flex-wrap: wrap; row-gap: 0; }
+  .jezik {
+    order: 3;
+    flex: 0 0 100%;
+    max-height: 44px;
+    overflow: hidden;
+    transition: max-height 0.25s ease, opacity 0.2s ease;
+  }
+  .glava.skrcena .jezik {
+    display: flex;
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
 /* ---------- postavitev: vse levo ---------- */
 
 /* vodoravno režemo na korenu in telesu, ne na main - sicer bi odrezalo kup
@@ -1170,6 +1190,8 @@ html:not(.js) .glava { position: static; }
   border-top: 1px solid var(--rob);
 }
 .noga p { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--tise); max-width: 46ch; }
+.noga-kontakt { margin-top: 8px !important; }
+.noga a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 .noga-znamka {
   margin-top: 12px !important;
   font-family: Oswald, Inter, sans-serif;
@@ -1252,6 +1274,6 @@ html:not(.js) .glava { position: static; }
   .obrazec, .prenos { transition: none; }
   .glavni-gumb::after { animation: none; display: none; }
   .vrh-slika img, .pas img { transform: none !important; }
-  .glava, .glava-vsebina { transition: none; }
+  .glava, .glava-vsebina, .jezik { transition: none; }
   .razkrij, .js .razkrij { opacity: 1; transform: none; transition: none; }
 }

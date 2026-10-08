@@ -6,25 +6,25 @@
       in napisi samo tiste kljuce, ki se razlikujejo,
    2. dodaj kodo v BR_SEZNAM_JEZIKOV, v vrstnem redu gumbov v glavi,
    3. popravi "brskalnik" pri sorodnih jezikih, da si predpon ne kradejo.
-   Gumbi v glavi se izrisejo iz seznama, HTML se ne spreminja.
+   Gumbi v glavi se izrisejo iz seznama; v index.html je zaradi strani brez
+   skripta se vedno staticna kopija gumbov, ki jo je treba uskladiti.
 
-   Primer, ko bo prisla locena hrvaska razlicica:
-     hr: { osnova: 'sr', oznaka: 'hr', html_lang: 'hr', brskalnik: ['hr'],
-           teza: 'Tjelesna težina', trajanje_pod6m: 'manje od 6 mjeseci', ... }
-   in iz sr.brskalnik odstranis 'hr'.
+   Jeziki: sl (besedilo je hkrati v index.html), sr (ekavica, latinica),
+   hr (ijekavica) in en. sr in hr sta samostojna prevoda in ne podedujeta nicesar.
 
    Imena dvigov na kartici so vedno angleska in so v kartica.js. */
 
 var BR_JEZIKI = {
 
   sl: {
-    oznaka: 'slo',
+    oznaka: 'SL',
+    ime: 'Slovenščina',
     html_lang: 'sl',
     brskalnik: ['sl'],
 
     /* pristanek */
     naslov: 'Kakšen je tvoj rang?',
-    podnapis: 'V petnajstih sekundah izveš, kje si med ljudmi svoje teže, in dobiš kartico za objavo.',
+    podnapis: 'Bron, srebro, zlato, platina ali diamant? Vpiši svoj dvig in izvedi, koliko dvigalcev premagaš.',
 
     /* obrazec */
     dvig: 'Dvig',
@@ -45,7 +45,7 @@ var BR_JEZIKI = {
 
     vzdevek: 'Vzdevek',
     namig_vzdevek: 'neobvezno',
-    vzdevek_opomba: 'Z vzdevkom prideš na lestvico. Brez njega dobiš samo kartico.',
+    vzdevek_opomba: 'Vzdevek potrebuješ, da se uvrstiš na lestvico.',
 
     spol: 'Spol',
     spol_m: 'moški',
@@ -85,7 +85,7 @@ var BR_JEZIKI = {
     g_cta: 'Izračunaj',
 
     /* lestvica mej */
-    l_naslov: 'Kaj moraš dvigniti',
+    l_naslov: 'Koliko moraš dvigniti',
     l_opis: 'Meja za vsak rang, kot večkratnik telesne teže.',
     l_stolpec_rang: 'Rang',
     l_opomba_zgibi: 'Pri zgibih štejejo ponovitve: {zgibi}.',
@@ -122,6 +122,7 @@ var BR_JEZIKI = {
     /* noga */
     opozorilo: 'Številke so ocena na podlagi javno dostopnih podatkov o dvigih, ne uradni podatek.',
     primerjava: 'Primerjava z obiskovalci fitnesa.',
+    kontakt: 'Kontakt:',
 
     /* kartica */
     znamka: 'BALKAN RANK',
@@ -139,16 +140,18 @@ var BR_JEZIKI = {
     }
   },
 
-  /* ekavica; dokler ni locene hrvaske razlicice, pokriva vso regijo,
-     zato je oznaka na gumbu se vedno "bhs" */
+  /* srbscina: ekavica, latinica */
   sr: {
-    oznaka: 'bhs',
-    html_lang: 'sr-Latn',
-    brskalnik: ['sr', 'bs', 'sh', 'hr'],
+    oznaka: 'SR',
+    ime: 'Srpski',
+    html_lang: 'sr',
+    brskalnik: ['sr'],
 
+    /* pristanek */
     naslov: 'Koji je tvoj rang?',
-    podnapis: 'Za petnaest sekundi saznaš gde si među ljudima svoje težine i dobiješ karticu za objavu.',
+    podnapis: 'Bronza, srebro, zlato, platina ili dijamant? Upiši šta dižeš i saznaj koliko dizača ostavljaš iza sebe.',
 
+    /* obrazec */
     dvig: 'Vežba',
     dvig_bench: 'Bench press',
     dvig_pocep: 'Čučanj',
@@ -167,7 +170,7 @@ var BR_JEZIKI = {
 
     vzdevek: 'Nadimak',
     namig_vzdevek: 'nije obavezno',
-    vzdevek_opomba: 'Sa nadimkom ulaziš na lestvicu. Bez njega dobiješ samo karticu.',
+    vzdevek_opomba: 'Da uđeš na rang listu, treba ti nadimak.',
 
     spol: 'Pol',
     spol_m: 'muški',
@@ -182,38 +185,44 @@ var BR_JEZIKI = {
 
     izracunaj: 'Izračunaj rang',
 
+    /* napake */
     e_kolicina_kg: 'Upiši podignutu težinu.',
     e_kolicina_pon: 'Upiši koliko ponavljanja radiš.',
     e_kolicina_meja: 'Taj broj ne izgleda tačno. Proveri ga.',
     e_teza: 'Upiši svoju telesnu težinu.',
-    e_teza_meja: 'Telesna težina treba da bude između 30 i 250 kg.',
-    e_nemogoce_kg: 'Za ovu vežbu primamo najviše {meja}-struku telesnu težinu. Proveri broj.',
+    e_teza_meja: 'Telesna težina mora biti između 30 i 250 kg.',
+    e_nemogoce_kg: 'Za ovu vežbu primamo najviše {meja}× telesnu težinu. Proveri broj.',
     e_nemogoce_pon: 'Primamo najviše {meja} ponavljanja. Proveri broj.',
-    e_vzdevek: 'Nadimak treba da ima od 2 do 20 znakova.',
+    e_vzdevek: 'Nadimak mora imati od 2 do 20 znakova.',
     e_email: 'Upiši svoj e-mail.',
     e_email_oblika: 'Taj e-mail ne izgleda tačno. Proveri ga.',
 
+    /* prenos */
     p_naslov: 'Upiši e-mail i preuzmi karticu',
     p_namig: 'ti@primer.com',
     p_gumb: 'Preuzmi karticu',
     p_tece: 'Preuzimam…',
     p_racunam: 'Računam…',
     p_opomba: 'Preuzimaju se oba formata: uspravni 1080 × 1350 i vodoravni 1600 × 900.',
-    p_konec: 'Kartice su preuzete. Pogledaj u folder sa preuzimanjima.',
+    p_konec: 'Kartice su preuzete. Pogledaj u folderu sa preuzimanjima.',
 
+    /* glava ob drsenju */
     g_cta: 'Izračunaj',
 
-    l_naslov: 'Šta moraš da digneš',
-    l_opis: 'Granica za svaki rang, kao umnožak telesne težine.',
+    /* lestvica mej */
+    l_naslov: 'Koliko moraš da digneš',
+    l_opis: 'Granica za svaki rang, kao višekratnik telesne težine.',
     l_stolpec_rang: 'Rang',
     l_opomba_zgibi: 'Kod zgibova se broje ponavljanja: {zgibi}.',
     l_za_moske: 'za muškarce',
     l_za_zenske: 'za žene',
 
+    /* kratka lestvica nad obrazcem */
     kr_naslov: 'Najjači',
-    kr_gumb: 'Prikaži celu lestvicu',
+    kr_gumb: 'Prikaži celu rang listu',
 
-    r_naslov: 'Lestvica',
+    /* lestvica ljudi */
+    r_naslov: 'Rang lista',
     r_opis: 'Najboljih dvadeset po odnosu prema telesnoj težini.',
     r_opis_zgibi: 'Najboljih dvadeset po broju ponavljanja.',
     r_mesto_stolpec: '#',
@@ -222,21 +231,25 @@ var BR_JEZIKI = {
     r_razmerje: 'Odnos',
     r_ponovitve: 'Ponavljanja',
     r_rang: 'Rang',
-    r_opomba: 'Na lestvicu se ulazi nadimkom u obrascu. Prikazani su nadimak, telesna težina, odnos i rang — ništa drugo.',
-    r_mesto: 'Ti si {mesto}. od {skupaj} na lestvici.',
+    r_opomba: 'Na rang listu ulaziš sa nadimkom iz obrasca. Prikazani su nadimak, telesna težina, odnos i rang — ništa drugo.',
+    r_mesto: 'Ti si {mesto}. od {skupaj} na rang listi.',
     r_mesto_brez: 'Sa nadimkom bi tvoj rezultat bio {mesto}. od {skupaj}.',
 
+    /* pogosta vprasanja */
     v_naslov: 'Česta pitanja',
     v1_q: 'Kako se računa rang?',
-    v1_a: 'Podignutu težinu delimo tvojom telesnom težinom, a kod zgibova brojimo ponavljanja. Rang je najviši stepen čiju granicu rezultat dostigne. Procenat se između dve granice linearno interpolira i ograničen je na 1–99.',
+    v1_a: 'Podignutu težinu delimo tvojom telesnom težinom, a kod zgibova brojimo ponavljanja. Rang je najviši nivo čiju granicu tvoj rezultat dostigne. Procenat se između dve granice linearno interpolira i ograničen je na 1–99.',
     v2_q: 'Odakle podaci?',
-    v2_a: 'Granice su postavljene po javno dostupnim podacima o standardima snage, ne po merenju posetilaca ove stranice. To je procena, nije zvaničan podatak.',
+    v2_a: 'Granice su postavljene prema javno dostupnim podacima o standardima snage, a ne prema merenjima posetilaca ove stranice. To je procena, nije zvaničan podatak.',
     v3_q: 'Da li je besplatno?',
-    v3_a: 'Jeste. E-mail upisuješ samo pri preuzimanju kartice i čuva se zajedno sa rangom i vežbom. Nadimak nije obavezan; ko ga upiše, vidi se sa njim na lestvici.',
+    v3_a: 'Jeste. E-mail upisuješ samo pri preuzimanju kartice i čuva se zajedno sa rangom i vežbom. Nadimak nije obavezan; ko ga upiše, vidi se sa njim na rang listi.',
 
+    /* noga */
     opozorilo: 'Brojke su procena na osnovu javno dostupnih podataka o dizanju, nisu zvaničan podatak.',
     primerjava: 'Poređenje sa posetiocima teretane.',
+    kontakt: 'Kontakt:',
 
+    /* kartica */
     znamka: 'BALKAN RANK',
     k_enota_kg: 'KG',
     k_enota_pon: '×',
@@ -252,13 +265,139 @@ var BR_JEZIKI = {
     }
   },
 
+  /* hrvascina: ijekavica, standardni jezik */
+  hr: {
+    oznaka: 'HR',
+    ime: 'Hrvatski',
+    html_lang: 'hr',
+    brskalnik: ['hr'],
+
+    /* pristanek */
+    naslov: 'Koji je tvoj rang?',
+    podnapis: 'Bronca, srebro, zlato, platina ili dijamant? Upiši što dižeš i saznaj koliko dizača ostavljaš iza sebe.',
+
+    /* obrazec */
+    dvig: 'Vježba',
+    dvig_bench: 'Bench press',
+    dvig_pocep: 'Čučanj',
+    dvig_mrtvi: 'Mrtvo dizanje',
+    dvig_zgibi: 'Zgibovi',
+
+    kolicina_kg: 'Podignuta težina',
+    kolicina_pon: 'Koliko ponavljanja',
+    enota_kg: 'kg',
+    enota_pon: '×',
+    namig_kg: '0',
+    namig_pon: '0',
+
+    teza: 'Tjelesna težina',
+    namig_teza: '75',
+
+    vzdevek: 'Nadimak',
+    namig_vzdevek: 'neobavezno',
+    vzdevek_opomba: 'Da uđeš na ljestvicu, treba ti nadimak.',
+
+    spol: 'Spol',
+    spol_m: 'muški',
+    spol_z: 'ženski',
+
+    trajanje: 'Treniram',
+    trajanje_pod6m: 'manje od 6 mjeseci',
+    trajanje_6_12m: '6–12 mjeseci',
+    trajanje_1_3l: '1–3 godine',
+    trajanje_3_5l: '3–5 godina',
+    trajanje_nad5l: 'više od 5 godina',
+
+    izracunaj: 'Izračunaj rang',
+
+    /* napake */
+    e_kolicina_kg: 'Upiši podignutu težinu.',
+    e_kolicina_pon: 'Upiši koliko ponavljanja radiš.',
+    e_kolicina_meja: 'Taj broj ne izgleda točno. Provjeri ga.',
+    e_teza: 'Upiši svoju tjelesnu težinu.',
+    e_teza_meja: 'Tjelesna težina mora biti između 30 i 250 kg.',
+    e_nemogoce_kg: 'Za ovu vježbu primamo najviše {meja}× tjelesnu težinu. Provjeri broj.',
+    e_nemogoce_pon: 'Primamo najviše {meja} ponavljanja. Provjeri broj.',
+    e_vzdevek: 'Nadimak mora imati od 2 do 20 znakova.',
+    e_email: 'Upiši svoj e-mail.',
+    e_email_oblika: 'Taj e-mail ne izgleda točno. Provjeri ga.',
+
+    /* prenos */
+    p_naslov: 'Upiši e-mail i preuzmi karticu',
+    p_namig: 'ti@primjer.com',
+    p_gumb: 'Preuzmi karticu',
+    p_tece: 'Preuzimam…',
+    p_racunam: 'Računam…',
+    p_opomba: 'Preuzimaju se oba formata: uspravni 1080 × 1350 i vodoravni 1600 × 900.',
+    p_konec: 'Kartice su preuzete. Pogledaj u mapi s preuzimanjima.',
+
+    /* glava ob drsenju */
+    g_cta: 'Izračunaj',
+
+    /* lestvica mej */
+    l_naslov: 'Koliko moraš dignuti',
+    l_opis: 'Granica za svaki rang, kao višekratnik tjelesne težine.',
+    l_stolpec_rang: 'Rang',
+    l_opomba_zgibi: 'Kod zgibova se broje ponavljanja: {zgibi}.',
+    l_za_moske: 'za muškarce',
+    l_za_zenske: 'za žene',
+
+    /* kratka lestvica nad obrazcem */
+    kr_naslov: 'Najjači',
+    kr_gumb: 'Prikaži cijelu ljestvicu',
+
+    /* lestvica ljudi */
+    r_naslov: 'Ljestvica',
+    r_opis: 'Najboljih dvadeset po odnosu prema tjelesnoj težini.',
+    r_opis_zgibi: 'Najboljih dvadeset po broju ponavljanja.',
+    r_mesto_stolpec: '#',
+    r_vzdevek: 'Nadimak',
+    r_teza: 'Težina',
+    r_razmerje: 'Omjer',
+    r_ponovitve: 'Ponavljanja',
+    r_rang: 'Rang',
+    r_opomba: 'Na ljestvicu ulaziš s nadimkom iz obrasca. Prikazani su nadimak, tjelesna težina, omjer i rang — ništa drugo.',
+    r_mesto: 'Ti si {mesto}. od {skupaj} na ljestvici.',
+    r_mesto_brez: 'S nadimkom bi tvoj rezultat bio {mesto}. od {skupaj}.',
+
+    /* pogosta vprasanja */
+    v_naslov: 'Česta pitanja',
+    v1_q: 'Kako se računa rang?',
+    v1_a: 'Podignutu težinu dijelimo tvojom tjelesnom težinom, a kod zgibova brojimo ponavljanja. Rang je najviša razina čiju granicu tvoj rezultat dosegne. Postotak se između dvije granice linearno interpolira i ograničen je na 1–99.',
+    v2_q: 'Odakle podaci?',
+    v2_a: 'Granice su postavljene prema javno dostupnim podacima o standardima snage, a ne prema mjerenjima posjetitelja ove stranice. To je procjena, nije službeni podatak.',
+    v3_q: 'Je li besplatno?',
+    v3_a: 'Da. E-mail upisuješ samo pri preuzimanju kartice i sprema se zajedno s rangom i vježbom. Nadimak nije obavezan; tko ga upiše, vidi se s njim na ljestvici.',
+
+    /* noga */
+    opozorilo: 'Brojke su procjena na temelju javno dostupnih podataka o dizanju, nisu službeni podatak.',
+    primerjava: 'Usporedba s posjetiteljima teretane.',
+    kontakt: 'Kontakt:',
+
+    /* kartica */
+    znamka: 'BALKAN RANK',
+    k_enota_kg: 'KG',
+    k_enota_pon: '×',
+    k_do: 'DO',
+    k_ti: 'TI',
+    k_vrh: 'VRH',
+    k_telesna_teza: 'TJELESNA TEŽINA',
+    k_ponovitve: 'PONAVLJANJA',
+    k_rang: 'RANG',
+    rangi: {
+      BRON: 'BRONCA', SREBRO: 'SREBRO', ZLATO: 'ZLATO',
+      PLATINA: 'PLATINA', DIAMANT: 'DIJAMANT'
+    }
+  },
+
   en: {
-    oznaka: 'en',
+    oznaka: 'EN',
+    ime: 'English',
     html_lang: 'en',
     brskalnik: ['en'],
 
     naslov: 'What is your rank?',
-    podnapis: 'In fifteen seconds you find out where you stand among people your weight, and you get a card to post.',
+    podnapis: 'Bronze, silver, gold, platinum or diamond? Enter your lift and find out how many lifters you beat.',
 
     dvig: 'Lift',
     dvig_bench: 'Bench press',
@@ -278,7 +417,7 @@ var BR_JEZIKI = {
 
     vzdevek: 'Nickname',
     namig_vzdevek: 'optional',
-    vzdevek_opomba: 'A nickname puts you on the leaderboard. Without one you just get the card.',
+    vzdevek_opomba: 'You need a nickname to get on the leaderboard.',
 
     spol: 'Sex',
     spol_m: 'male',
@@ -314,7 +453,7 @@ var BR_JEZIKI = {
 
     g_cta: 'Get rank',
 
-    l_naslov: 'What you need to lift',
+    l_naslov: 'How much you need to lift',
     l_opis: 'The threshold for each rank, as a multiple of body weight.',
     l_stolpec_rang: 'Rank',
     l_opomba_zgibi: 'Pull-ups count reps: {zgibi}.',
@@ -347,6 +486,7 @@ var BR_JEZIKI = {
 
     opozorilo: 'These numbers are an estimate based on publicly available lifting data, not an official figure.',
     primerjava: 'Compared with gym-goers.',
+    kontakt: 'Contact:',
 
     znamka: 'BALKAN RANK',
     k_enota_kg: 'KG',
@@ -365,16 +505,20 @@ var BR_JEZIKI = {
 };
 
 /* vrstni red gumbov v glavi */
-var BR_SEZNAM_JEZIKOV = ['sl', 'sr', 'en'];
+var BR_SEZNAM_JEZIKOV = ['sl', 'sr', 'hr', 'en'];
 
 var BR_JEZIK = (function () {
   'use strict';
 
-  var KLJUC = 'balkan-rank-jezik';
+  var KLJUC = 'balkan-rank-jezik-2';
   var PRIVZETI = 'en';
 
-  /* kode, ki so se v brskalnikih obiskovalcev ze shranile pod starim imenom */
-  var STARE_KODE = { bhs: 'sr', rs: 'sr' };
+  /* Stari kljuc je hranil tudi regionalno izbiro (koda "sr", prej "bhs" ali
+     "rs"). Kode "sr" ni mogoce locevati od nove srbscine, zato iz starega
+     kljuca prenesemo samo "sl" in "en"; vse ostalo tiho zavrzemo in obiskovalec
+     dobi navaden zacetni jezik. */
+  var STARI_KLJUC = 'balkan-rank-jezik';
+  var PRENESLJIVE = { sl: true, en: true };
 
   /* razlicica podeduje besedila osnove in prepise samo svoja */
   function razresiOsnove() {
@@ -414,7 +558,16 @@ var BR_JEZIK = (function () {
   function shranjen() {
     try {
       var k = localStorage.getItem(KLJUC);
-      if (k && STARE_KODE[k]) k = STARE_KODE[k];
+      if (!k) {
+        var staro = localStorage.getItem(STARI_KLJUC);
+        if (staro !== null) {
+          localStorage.removeItem(STARI_KLJUC);
+          if (PRENESLJIVE[staro]) {
+            localStorage.setItem(KLJUC, staro);
+            k = staro;
+          }
+        }
+      }
       return BR_JEZIKI[k] ? k : null;
     } catch (e) {
       return null;   /* zasebno okno ali blokiran pomnilnik */

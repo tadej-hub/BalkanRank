@@ -15,14 +15,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;500&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="stil.css?v=24">
+<link rel="stylesheet" href="stil.css?v=29">
 
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   "name": "Balkan Rank",
-  "inLanguage": ["sl", "sr-Latn", "en"],
+  "inLanguage": ["sl", "sr", "hr", "en"],
   "applicationCategory": "HealthApplication",
   "operatingSystem": "Vsi brskalniki",
   "browserRequirements": "Zahteva JavaScript za izračun in izris kartice.",
@@ -31,7 +31,7 @@
     "Izračun ranga za bench press, počep, mrtvi dvig in zgibe",
     "Odstotek glede na javno dostopne standarde moči",
     "Kartica v pokončni in ležeči obliki za prenos",
-    "Slovenščina, bosansko-hrvaško-srbsko in angleško"
+    "Slovenščina, srbščina, hrvaščina in angleščina"
   ],
   "offers": {
     "@type": "Offer",
@@ -87,7 +87,7 @@
       BALKAN<span>RANK</span>
     </div>
     <!-- gumbi se izrišejo iz BR_SEZNAM_JEZIKOV -->
-    <nav class="jezik" id="jezik-izbira" aria-label="Jezik / Jezik / Language"><button type="button" class="jezik-gumb aktiven" data-jezik="sl">slo</button><button type="button" class="jezik-gumb" data-jezik="sr">bhs</button><button type="button" class="jezik-gumb" data-jezik="en">en</button></nav>
+    <nav class="jezik" id="jezik-izbira" aria-label="Jezik / Language"><button type="button" class="jezik-gumb aktiven" data-jezik="sl" aria-label="Slovenščina" title="Slovenščina">SL</button><button type="button" class="jezik-gumb" data-jezik="sr" aria-label="Srpski" title="Srpski">SR</button><button type="button" class="jezik-gumb" data-jezik="hr" aria-label="Hrvatski" title="Hrvatski">HR</button><button type="button" class="jezik-gumb" data-jezik="en" aria-label="English" title="English">EN</button></nav>
     <button type="button" class="glava-cta" id="glava-cta" data-t="g_cta">Izračunaj</button>
   </div>
 </header>
@@ -106,7 +106,7 @@
 
     <div class="pristanek">
       <h1 data-t="naslov">Kakšen je tvoj rang?</h1>
-      <p class="podnapis" data-t="podnapis">V petnajstih sekundah izveš, kje si med ljudmi svoje teže, in dobiš kartico za objavo.</p>
+      <p class="podnapis" data-t="podnapis">Bron, srebro, zlato, platina ali diamant? Vpiši svoj dvig in izvedi, koliko dvigalcev premagaš.</p>
     </div>
 
     <!-- kartice se rišejo v canvas, da so v izbranem jeziku -->
@@ -222,7 +222,7 @@
           </span>
         </div>
       </div>
-      <p class="vrstica-opomba" data-t="vzdevek_opomba">Z vzdevkom prideš na lestvico. Brez njega dobiš samo kartico.</p>
+      <p class="vrstica-opomba" data-t="vzdevek_opomba">Vzdevek potrebuješ, da se uvrstiš na lestvico.</p>
 
       <div class="vrstica">
         <span class="oznaka" id="oznaka-spol" data-t="spol">Spol</span>
@@ -273,7 +273,7 @@
     </picture>
     <div class="razdelek-tanca" aria-hidden="true"></div>
 
-    <h2 data-t="l_naslov">Kaj moraš dvigniti</h2>
+    <h2 data-t="l_naslov">Koliko moraš dvigniti</h2>
     <p class="razdelek-opis">
       <span data-t="l_opis">Meja za vsak rang, kot večkratnik telesne teže.</span>
       <span class="lestvica-spol" id="lestvica-spol"> (za moške)</span>
@@ -332,15 +332,16 @@
 <footer class="noga">
   <p data-t="opozorilo">Številke so ocena na podlagi javno dostopnih podatkov o dvigih, ne uradni podatek.</p>
   <p data-t="primerjava">Primerjava z obiskovalci fitnesa.</p>
+  <p class="noga-kontakt"><span data-t="kontakt">Kontakt:</span> <a href="mailto:balkanrank.info@gmail.com">balkanrank.info@gmail.com</a></p>
   <p class="noga-znamka">BALKAN RANK</p>
 </footer>
 
-<script src="config.js?v=24"></script>
-<script src="jeziki.js?v=24"></script>
-<script src="baza.js?v=24"></script>
-<script src="izracun.js?v=24"></script>
-<script src="logo.js?v=24"></script>
-<script src="kartica.js?v=24"></script>
-<script src="app.js?v=24"></script>
+<script src="config.js?v=29"></script>
+<script src="jeziki.js?v=29"></script>
+<script src="baza.js?v=29"></script>
+<script src="izracun.js?v=29"></script>
+<script src="logo.js?v=29"></script>
+<script src="kartica.js?v=29"></script>
+<script src="app.js?v=29"></script>
 </body>
 </html>

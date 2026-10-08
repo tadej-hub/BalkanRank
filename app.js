@@ -63,7 +63,8 @@
   /* gumbi v glavi pridejo iz seznama jezikov, ne iz HTML */
   function izrisiGumbeJezikov() {
     izbiraJezika.innerHTML = BR_SEZNAM_JEZIKOV.map(function (k) {
-      return '<button type="button" class="jezik-gumb" data-jezik="' + k + '">' +
+      return '<button type="button" class="jezik-gumb" data-jezik="' + k + '" aria-label="' +
+             BR_JEZIKI[k].ime + '" title="' + BR_JEZIKI[k].ime + '">' +
              BR_JEZIKI[k].oznaka + '</button>';
     }).join('');
   }

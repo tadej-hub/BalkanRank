@@ -17,7 +17,7 @@ iz brskalnika.
 | `app.js` | obrazec, preverjanje vnosa, rezultat, prenos, preklop jezika |
 | `izracun.js` | meje rangov, rang, odstotek, napredek — brez DOM |
 | `kartica.js` | risanje pokončne (1080×1350) in ležeče (1600×900) kartice |
-| `jeziki.js` | vsa besedila za sl / sr / en |
+| `jeziki.js` | vsa besedila za sl / sr / hr / en |
 | `baza.js` | vstavljanje v Supabase in branje lestvice |
 | `config.js` | URL in javni ključ Supabase |
 | `baza.sql` | tabeli in pravila dostopa za Supabase |
